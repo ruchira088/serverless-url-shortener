@@ -6,9 +6,7 @@ case class FutureM[+A, M[+_]](future: Future[M[A]]) {
   def flatMap[B](f: A => FutureM[B, M])(implicit monad: Monad[M], executionContext: ExecutionContext): FutureM[B, M] =
     FutureM {
       future.flatMap {
-        monad.fold[A, Future[M[B]]](a => f(a).future) {
-          throwable => Future.successful(monad.failure(throwable))
-        }
+        monad.fold[A, Future[M[B]]](throwable => Future.successful(monad.failure(throwable)))(a => f(a).future)
       }
     }
 
