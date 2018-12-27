@@ -4,7 +4,7 @@ import java.net.HttpURLConnection
 
 import com.amazonaws.services.lambda.runtime.{Context, RequestHandler}
 import com.ruchij.lambda.models.{Request, Response}
-import com.ruchij.models.ServiceInformation
+import com.ruchij.health.models.ServiceInformation
 import play.api.libs.json.Json
 
 class HealthCheck extends RequestHandler[Request, Response] {

@@ -11,4 +11,6 @@ object Dependencies {
   lazy val playJson = "com.typesafe.play" %% "play-json" % "2.6.13"
 
   lazy val dynamoDbSdk = "com.amazonaws" % "aws-java-sdk-dynamodb" % "1.11.475"
+  
+  lazy val jodaTime = "joda-time" % "joda-time" % "2.10.1"
 }

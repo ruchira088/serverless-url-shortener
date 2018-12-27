@@ -1,4 +1,4 @@
-package com.ruchij.models
+package com.ruchij.health.models
 
 import com.ruchij.eed3si9n.BuildInfo
 import play.api.libs.json.{Json, OFormat}

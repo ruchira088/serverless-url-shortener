@@ -19,7 +19,8 @@ lazy val root =
             awsLambdaJavaCore,
             awsLambdaJavaEvents,
             playJson,
-            dynamoDbSdk
+            dynamoDbSdk,
+            jodaTime
           )
       )
 
