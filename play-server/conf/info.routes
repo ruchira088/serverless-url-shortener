@@ -1,0 +1,1 @@
+GET     /service-info           web.controllers.InfoController.serviceInformation()
