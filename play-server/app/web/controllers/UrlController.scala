@@ -1,6 +1,6 @@
 package web.controllers
 
-import com.ruchij.lambda.handlers.UrlShortenerHandler
+import com.ruchij.lambda.handlers.UrlInsertionHandler
 import com.ruchij.services.url.UrlShorteningService
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.JsValue
@@ -12,7 +12,7 @@ import scala.concurrent.ExecutionContext
 
 @Singleton
 class UrlController @Inject()(
-  urlShortenerHandler: UrlShortenerHandler,
+  urlShortenerHandler: UrlInsertionHandler,
   urlShorteningService: UrlShorteningService,
   controllerComponents: ControllerComponents
 )(implicit executionContext: ExecutionContext)
@@ -20,7 +20,7 @@ class UrlController @Inject()(
 
   def insert(): Action[JsValue] =
     Action.async(parse.json) { request =>
-      urlShortenerHandler.handle(request, urlShorteningService)
+      urlShortenerHandler.insert(request, urlShorteningService)
         .map(ResponseUtils.responseMapper)
     }
 }
