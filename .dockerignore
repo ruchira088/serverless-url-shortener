@@ -7,3 +7,5 @@
 /play-server/target
 
 /.serverless
+
+/src/test/scala/com/ruchij/Playground.scala
