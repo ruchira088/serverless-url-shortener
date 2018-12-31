@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+  play-server:
+    build: .
+    ports:
+      - 9000:9000
+      - 5005:5005
+    tty: true
+    volumes:
+      - "~/.sbt:/root/.sbt"
+      - "~/.ivy2:/root/.ivy2"
+      - ".:/opt/url-shortener"
+      - "/opt/url-shortener/target"
+      - "/opt/url-shortener/play-server/target"
+      - "/opt/url-shortener/project/target"
+
+  dynamo-db:
+    image: amazon/dynamodb-local

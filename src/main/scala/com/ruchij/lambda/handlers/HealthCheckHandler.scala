@@ -7,7 +7,7 @@ import com.ruchij.lambda.models.{Request, Response}
 import com.ruchij.health.models.ServiceInformation
 import play.api.libs.json.Json
 
-class HealthCheck extends RequestHandler[Request, Response] {
+class HealthCheckHandler extends RequestHandler[Request, Response] {
   override def handleRequest(request: Request, context: Context): Response =
     Response(
       HttpURLConnection.HTTP_OK,

@@ -54,7 +54,7 @@ package:
 
 functions:
   healthCheck:
-    handler: com.ruchij.lambda.handlers.HealthCheck
+    handler: com.ruchij.lambda.handlers.HealthCheckHandler
     events:
       - http:
           path: health-check

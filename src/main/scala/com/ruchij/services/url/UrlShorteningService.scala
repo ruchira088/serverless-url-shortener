@@ -1,19 +1,22 @@
 package com.ruchij.services.url
+
 import com.ruchij.dao.UrlDao
+import com.ruchij.exceptions.MissingUrlKeyException
 import com.ruchij.general.Constants
 import com.ruchij.services.hashing.HashingService
 import com.ruchij.services.url.models.Url
-import exceptions.UrlKeyNotFoundException
+import javax.inject.{Inject, Singleton}
 import org.joda.time.DateTime
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class UrlShorteningService(urlDao: UrlDao, hashingService: HashingService) {
+@Singleton
+class UrlShorteningService @Inject()(urlDao: UrlDao, hashingService: HashingService) {
   def fetch(key: String)(implicit executionContext: ExecutionContext): Future[Url] =
-    urlDao.fetch(key).future
+    urlDao.incrementHit(key).future
       .flatMap {
-        case Some(_) => urlDao.incrementHit(key)
-        case _ => Future.failed(UrlKeyNotFoundException(key))
+        case Some(url) => Future.successful(url)
+        case _ => Future.failed(MissingUrlKeyException(key))
       }
 
   def insert(longUrl: String, suffix: String = Constants.EMPTY_STRING)(

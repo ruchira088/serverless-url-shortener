@@ -9,5 +9,5 @@ trait UrlDao {
 
   def fetch(key: String)(implicit executionContext: ExecutionContext): FutureOpt[Url]
 
-  def incrementHit(key: String)(implicit executionContext: ExecutionContext): Future[Url]
+  def incrementHit(key: String)(implicit executionContext: ExecutionContext): FutureOpt[Url]
 }

@@ -10,9 +10,12 @@ trait HashingService {
 object HashingService {
   val VALUES: Array[String] = ('1' to 'z' toArray).filter(_.isLetterOrDigit).map(_.toString)
 
-  def calculateString(int: Int): String =
-    if (int < VALUES.length)
-      VALUES(int)
+  def calculateString(int: Int): String = {
+    val absInt = math.abs(int)
+
+    if (absInt < VALUES.length)
+      VALUES(absInt)
     else
-      VALUES(int % VALUES.length) + calculateString(int / VALUES.length)
+      VALUES(absInt % VALUES.length) + calculateString(absInt / VALUES.length)
+  }
 }

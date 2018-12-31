@@ -1,0 +1,9 @@
+/.idea
+/target
+
+/project/target
+/project/project
+
+/play-server/target
+
+/.serverless

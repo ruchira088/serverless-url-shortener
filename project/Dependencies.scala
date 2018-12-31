@@ -13,4 +13,6 @@ object Dependencies {
   lazy val dynamoDbSdk = "com.amazonaws" % "aws-java-sdk-dynamodb" % "1.11.475"
   
   lazy val jodaTime = "joda-time" % "joda-time" % "2.10.1"
+  
+  lazy val googleGuice = "com.google.inject" % "guice" % "4.2.2"
 }
