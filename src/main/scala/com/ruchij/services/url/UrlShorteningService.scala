@@ -5,6 +5,7 @@ import com.ruchij.exceptions.MissingUrlKeyException
 import com.ruchij.general.Constants
 import com.ruchij.services.hashing.HashingService
 import com.ruchij.services.url.models.Url
+import com.ruchij.services.url.UrlShorteningService.mapper
 import javax.inject.{Inject, Singleton}
 import org.joda.time.DateTime
 
@@ -13,11 +14,10 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class UrlShorteningService @Inject()(urlDao: UrlDao, hashingService: HashingService) {
   def fetch(key: String)(implicit executionContext: ExecutionContext): Future[Url] =
-    urlDao.incrementHit(key).future
-      .flatMap {
-        case Some(url) => Future.successful(url)
-        case _ => Future.failed(MissingUrlKeyException(key))
-      }
+    urlDao.incrementHit(key).future.flatMap(mapper(key))
+
+  def info(key: String)(implicit executionContext: ExecutionContext): Future[Url] =
+    urlDao.fetch(key).future.flatMap(mapper(key))
 
   def insert(longUrl: String, suffix: String = Constants.EMPTY_STRING)(
     implicit executionContext: ExecutionContext
@@ -31,4 +31,11 @@ class UrlShorteningService @Inject()(urlDao: UrlDao, hashingService: HashingServ
           if (url.longUrl == longUrl) Future.successful(Left(url)) else insert(longUrl, suffix + key)
         }
     } yield result
+}
+
+object UrlShorteningService {
+  def mapper(key: String): PartialFunction[Option[Url], Future[Url]] = {
+    case Some(url) => Future.successful(url)
+    case _ => Future.failed(MissingUrlKeyException(key))
+  }
 }

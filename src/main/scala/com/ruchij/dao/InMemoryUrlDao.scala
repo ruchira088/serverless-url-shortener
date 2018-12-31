@@ -27,7 +27,15 @@ class InMemoryUrlDao @Inject()(var concurrentHashMap: ConcurrentHashMap[Url, Uni
 
   override def incrementHit(key: String)(implicit executionContext: ExecutionContext): FutureOpt[Url] =
     fetch(key)
-      .flatMapF(url => insert(url.copy(hits = url.hits + 1)))
+      .flatMapF {
+        url =>
+          insert(url.copy(hits = url.hits + 1))
+            .map {
+              newUrl =>
+                concurrentHashMap.remove(url)
+                newUrl
+            }
+      }
 }
 
 object InMemoryUrlDao {

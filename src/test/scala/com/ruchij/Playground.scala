@@ -1,10 +1,10 @@
 package com.ruchij
-import com.ruchij.lambda.handlers.UrlFetchHandler
+import com.ruchij.lambda.handlers.UrlInfoHandler
 
 object Playground {
   def main(args: Array[String]): Unit = {
     println {
-      UrlFetchHandler.extractKey("/url/hello/world")
+      UrlInfoHandler.extractKey("/url/hello/world")
     }
   }
 }
