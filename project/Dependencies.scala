@@ -12,7 +12,7 @@ object Dependencies {
 
   lazy val dynamoDbSdk = "software.amazon.awssdk" % "dynamodb" % "2.2.0"
 
-  lazy val slick = "com.typesafe.slick" %% "slick" % "3.2.0"
+  lazy val slick = "com.typesafe.slick" %% "slick" % "3.2.1"
 
   lazy val playSlick = "com.typesafe.play" %% "play-slick" % "3.0.3"
 

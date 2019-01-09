@@ -27,13 +27,13 @@ class SlickUrlDao(val jdbcProfile: JdbcProfile, db: BasicBackend#DatabaseDef) ex
         timestamp => new DateTime(timestamp.getTime)
       )
 
-    def key: Rep[String] = column[String]("KEY", O.PrimaryKey)
+    def key: Rep[String] = column[String]("key", O.PrimaryKey)
 
-    def createdAt: Rep[DateTime] = column[DateTime]("CREATED_AT")
+    def createdAt: Rep[DateTime] = column[DateTime]("created_at")
 
-    def longUrl: Rep[String] = column[String]("LONG_URL")
+    def longUrl: Rep[String] = column[String]("long_url")
 
-    def hits: Rep[Double] = column[Double]("HITS")
+    def hits: Rep[Double] = column[Double]("hits")
 
     override def * : ProvenShape[Url] =
       (key, createdAt, longUrl, hits) <> (Url.apply _ tupled, Url.unapply)
@@ -62,5 +62,5 @@ class SlickUrlDao(val jdbcProfile: JdbcProfile, db: BasicBackend#DatabaseDef) ex
 }
 
 object SlickUrlDao {
-  val TABLE_NAME = "URL"
+  val TABLE_NAME = "url"
 }
