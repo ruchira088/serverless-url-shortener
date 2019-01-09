@@ -11,27 +11,22 @@ import web.responses.ResponseUtils.toResultFuture
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class UrlController @Inject()(
-  urlShortenerHandler: UrlInsertionHandler,
-  urlInfoHandler: UrlInfoHandler,
-  urlRedirectHandler: UrlRedirectHandler,
-  urlShorteningService: UrlShorteningService,
-  controllerComponents: ControllerComponents
-)(implicit executionContext: ExecutionContext)
-    extends AbstractController(controllerComponents) {
+class UrlController @Inject()(urlShorteningService: UrlShorteningService, controllerComponents: ControllerComponents)(
+  implicit executionContext: ExecutionContext
+) extends AbstractController(controllerComponents) {
 
   def insert(): Action[JsValue] =
     Action.async(parse.json) { request =>
-      urlShortenerHandler.insert(request, urlShorteningService)
+      UrlInsertionHandler.insert(request, urlShorteningService)
     }
 
   def info(key: String): Action[AnyContent] =
-    Action.async {
-      request => urlInfoHandler.info(request, urlShorteningService)
+    Action.async { request =>
+      UrlInfoHandler.info(request, urlShorteningService)
     }
 
   def redirect(key: String): Action[AnyContent] =
-    Action.async {
-      request => urlRedirectHandler.redirect(request, urlShorteningService)
+    Action.async { request =>
+      UrlRedirectHandler.redirect(request, urlShorteningService)
     }
 }

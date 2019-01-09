@@ -7,6 +7,8 @@ services:
       - 9000:9000
       - 5005:5005
     tty: true
+    depends_on:
+      - postgres-database
     volumes:
       - "~/.sbt:/root/.sbt"
       - "~/.ivy2:/root/.ivy2"
@@ -14,6 +16,19 @@ services:
       - "/opt/url-shortener/target"
       - "/opt/url-shortener/play-server/target"
       - "/opt/url-shortener/project/target"
+    environment:
+      POSTGRES_URL: "jdbc:postgresql://postgres-database:5432/url-shortener"
+      POSTGRES_USER: "admin"
+      POSTGRES_PASSWORD: "passw0rd"
 
-  dynamo-db:
-    image: amazon/dynamodb-local
+#  dynamo-db:
+#    image: amazon/dynamodb-local
+
+  postgres-database:
+    image: postgres
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: "url-shortener"
+      POSTGRES_USER: "admin"
+      POSTGRES_PASSWORD: "passw0rd"

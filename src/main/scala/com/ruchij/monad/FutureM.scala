@@ -22,4 +22,9 @@ case class FutureM[+A, M[+_]](future: Future[M[A]]) {
 
   def map[B](f: A => B)(implicit monad: Monad[M], executionContext: ExecutionContext): FutureM[B, M] =
     flatMap { value => FutureM { Future.successful(monad.lift(f(value))) }}
+
+  def flatten(throwable: Throwable)(implicit monad: Monad[M], executionContext: ExecutionContext): Future[A] =
+    future.flatMap {
+      monad.fold[A, Future[A]](_ => Future.failed(throwable))(Future.successful)
+    }
 }

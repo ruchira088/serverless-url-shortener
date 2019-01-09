@@ -6,6 +6,7 @@ import com.amazonaws.services.lambda.runtime.{Context, RequestHandler}
 import com.ruchij.dao.InMemoryUrlDao
 import com.ruchij.ec.ServerlessBlockExecutionContext.blockingExecutionContext
 import com.ruchij.lambda.handlers.HandlerUtils._
+import com.ruchij.lambda.handlers.UrlRedirectHandler.redirect
 import com.ruchij.lambda.models.{Request, Response}
 import com.ruchij.services.hashing.MurmurHashingService
 import com.ruchij.services.url.UrlShorteningService
@@ -19,7 +20,9 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 class UrlRedirectHandler extends RequestHandler[Request, Response] {
   override def handleRequest(request: Request, context: Context): Response =
     Await.result(redirect(request, new UrlShorteningService(InMemoryUrlDao(), new MurmurHashingService)), Duration.Inf)
+}
 
+object UrlRedirectHandler {
   def redirect(request: Request, urlShorteningService: UrlShorteningService)(
     implicit executionContext: ExecutionContext
   ): Future[Response] =
