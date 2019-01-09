@@ -11,6 +11,7 @@ import com.ruchij.lambda.requests.InsertUrlRequest
 import com.ruchij.lambda.requests.RequestUtils.parseAndValidate
 import com.ruchij.services.hashing.MurmurHashingService
 import com.ruchij.services.url.UrlShorteningService
+import com.ruchij.services.url.models.ServiceConfiguration
 import play.api.libs.json.Json
 
 import scala.concurrent.duration.Duration
@@ -18,7 +19,13 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 
 class UrlInsertionHandler extends RequestHandler[Request, Response] {
   override def handleRequest(request: Request, context: Context): Response =
-    Await.result(insert(request, new UrlShorteningService(InMemoryUrlDao(), new MurmurHashingService)), Duration.Inf)
+    Await.result(
+      insert(
+        request,
+        new UrlShorteningService(InMemoryUrlDao(), new MurmurHashingService, ServiceConfiguration.default)
+      ),
+      Duration.Inf
+    )
 }
 
 object UrlInsertionHandler {

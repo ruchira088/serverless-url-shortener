@@ -10,6 +10,7 @@ import com.ruchij.lambda.handlers.UrlRedirectHandler.redirect
 import com.ruchij.lambda.models.{Request, Response}
 import com.ruchij.services.hashing.MurmurHashingService
 import com.ruchij.services.url.UrlShorteningService
+import com.ruchij.services.url.models.ServiceConfiguration
 import org.apache.http.HttpHeaders
 import play.api.libs.json.Json
 
@@ -19,7 +20,13 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 
 class UrlRedirectHandler extends RequestHandler[Request, Response] {
   override def handleRequest(request: Request, context: Context): Response =
-    Await.result(redirect(request, new UrlShorteningService(InMemoryUrlDao(), new MurmurHashingService)), Duration.Inf)
+    Await.result(
+      redirect(
+        request,
+        new UrlShorteningService(InMemoryUrlDao(), new MurmurHashingService, ServiceConfiguration.default)
+      ),
+      Duration.Inf
+    )
 }
 
 object UrlRedirectHandler {

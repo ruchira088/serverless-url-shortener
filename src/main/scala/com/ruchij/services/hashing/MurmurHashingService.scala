@@ -6,8 +6,11 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.util.hashing.MurmurHash3
 
 @Singleton
-class MurmurHashingService @Inject()(implicit blockingExecutionContext: BlockingExecutionContext) extends HashingService {
-  override def hash[A](value: A)(implicit stringifier: Stringifier[A], executionContext: ExecutionContext): Future[String] =
+class MurmurHashingService @Inject()(implicit blockingExecutionContext: BlockingExecutionContext)
+    extends HashingService {
+  override def hash[A](
+    value: A
+  )(implicit stringifier: Stringifier[A], executionContext: ExecutionContext): Future[String] =
     Future {
       HashingService.calculateString(MurmurHash3.stringHash(stringifier.stringify(value)))
     }(blockingExecutionContext)

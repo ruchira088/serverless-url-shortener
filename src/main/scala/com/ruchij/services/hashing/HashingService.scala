@@ -5,6 +5,20 @@ import scala.language.postfixOps
 
 trait HashingService {
   def hash[A](value: A)(implicit stringifier: Stringifier[A], executionContext: ExecutionContext): Future[String]
+
+  def hashWithFixedLength[A](value: A, length: Int)(
+    implicit stringifier: Stringifier[A],
+    executionContext: ExecutionContext
+  ): Future[String] =
+    hash(value)
+      .flatMap {
+        hashedString =>
+          if (hashedString.length >= length)
+            Future.successful(hashedString.substring(0, length))
+          else
+            hashWithFixedLength(stringifier.stringify(value) ++ hashedString, length - hashedString.length)
+              .map { hashedString ++ _ }
+      }
 }
 
 object HashingService {
