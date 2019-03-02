@@ -8,7 +8,6 @@ import scala.util.{Failure, Success, Try}
 
 object RequestUtils {
 
-  // I just wanna role my sleeves up, and start again
   def parseAndValidate[A](request: Request)(implicit reads: Reads[A], validator: Validator[A]): Try[A] =
     request.body.fold[Try[A]](Failure(NonExistentRequestBodyException)) { jsonString =>
       Try(Json.parse(jsonString))
