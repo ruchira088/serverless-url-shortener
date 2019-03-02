@@ -1,6 +1,6 @@
 package com.ruchij.monad
 
-import com.ruchij.exceptions.ErrorBuilder
+import com.ruchij.exceptions.{EmptyOptionException, ErrorBuilder}
 
 import scala.language.higherKinds
 import scala.util.{Failure, Success, Try}
@@ -8,7 +8,10 @@ import scala.util.{Failure, Success, Try}
 trait FoldableMonad[F[+ _]] extends Monad[F] {
   def fold[A, B](onFailure: Failure => B)(onSuccess: A => B)(value: F[A]): B
 
-  def failureMessage(value: F[_]): Option[String]
+  def throwable(failure: Failure): Throwable
+
+  def failureMessage[A](value: F[A]): Option[String] =
+    fold[A, Option[Throwable]](failure => Some(throwable(failure)))(_ => None)(value).map(_.getMessage)
 }
 
 object FoldableMonad {
@@ -24,8 +27,7 @@ object FoldableMonad {
 
     override def failure(failure: Unit): Option[Nothing] = None
 
-    override def failureMessage(value: Option[_]): Option[String] =
-      if (value.isEmpty) Some("Empty Option") else None
+    override def throwable(failure: Unit): Throwable = EmptyOptionException
   }
 
   implicit object TryMonad extends FoldableMonad[Try] {
@@ -40,7 +42,7 @@ object FoldableMonad {
 
     override def failure(fail: Throwable): Try[Nothing] = Failure(fail)
 
-    override def failureMessage(value: Try[_]): Option[String] = value.failed.map(_.getMessage).toOption
+    override def throwable(failure: Throwable): Throwable = failure
 
     def predicate[A <: Throwable](condition: Boolean, errorMessage: String)(implicit errorBuilder: ErrorBuilder[A]): Try[_] =
       if (condition) Success((): Unit) else Failure(errorBuilder.error(errorMessage))

@@ -1,4 +1,5 @@
 package com.ruchij.monad
+import scala.concurrent.{ExecutionContext, Future}
 import scala.language.higherKinds
 
 trait Monad[M[+ _]] extends Functor[M] {
@@ -10,4 +11,17 @@ trait Monad[M[+ _]] extends Functor[M] {
     flatMap[A, B](a => lift(f(a)))(value)
 
   def failure(fail: Failure): M[Nothing]
+}
+
+object Monad {
+  implicit def futureMonad(implicit executionContext: ExecutionContext): Monad[Future] { type Failure = Throwable } =
+    new Monad[Future] {
+      override type Failure = Throwable
+
+      override def flatMap[A, B](f: A => Future[B])(value: Future[A]): Future[B] = value.flatMap(f)
+
+      override def failure(fail: Throwable): Future[Nothing] = Future.failed[Nothing](fail)
+
+      override def lift[A](value: A): Future[A] = Future.successful(value)
+    }
 }

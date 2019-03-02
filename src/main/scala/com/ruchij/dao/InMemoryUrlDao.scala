@@ -3,7 +3,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 import com.ruchij.FutureOpt
 import com.ruchij.exceptions.InMemoryDatabasePersistenceException
-import com.ruchij.monad.FutureM
+import com.ruchij.monad.FoldableMonadInMonad
 import com.ruchij.services.url.models.Url
 import javax.inject.{Inject, Singleton}
 
@@ -19,7 +19,7 @@ class InMemoryUrlDao @Inject()(var concurrentHashMap: ConcurrentHashMap[Url, Uni
   }
 
   override def fetch(key: String)(implicit executionContext: ExecutionContext): FutureOpt[Url] =
-    FutureM {
+    FoldableMonadInMonad {
       Future.successful {
         concurrentHashMap.keys().asScala.find(_.key == key)
       }
@@ -27,7 +27,7 @@ class InMemoryUrlDao @Inject()(var concurrentHashMap: ConcurrentHashMap[Url, Uni
 
   override def incrementHit(key: String)(implicit executionContext: ExecutionContext): FutureOpt[Url] =
     fetch(key)
-      .flatMapF {
+      .flatMapM {
         url =>
           insert(url.copy(hits = url.hits + 1))
             .map {

@@ -18,10 +18,10 @@ class UrlShorteningService @Inject()(
   serviceConfiguration: ServiceConfiguration
 ) {
   def fetch(key: String)(implicit executionContext: ExecutionContext): Future[Url] =
-    urlDao.incrementHit(key).future.flatMap(mapper(key))
+    urlDao.incrementHit(key).value.flatMap(mapper(key))
 
   def info(key: String)(implicit executionContext: ExecutionContext): Future[Url] =
-    urlDao.fetch(key).future.flatMap(mapper(key))
+    urlDao.fetch(key).value.flatMap(mapper(key))
 
   def insert(longUrl: String)(implicit executionContext: ExecutionContext): Future[Either[Url, Url]] =
     insert(longUrl, Constants.EMPTY_STRING, serviceConfiguration.keyLength, serviceConfiguration.fixedKeyLengthRetries)
@@ -31,7 +31,7 @@ class UrlShorteningService @Inject()(
   ): Future[Either[Url, Url]] =
     for {
       key <- hashingService.hashWithFixedLength(longUrl + suffix, keySize)
-      existingUrl <- urlDao.fetch(key).future
+      existingUrl <- urlDao.fetch(key).value
 
       result <- existingUrl
         .fold[Future[Either[Url, Url]]](urlDao.insert(Url(key, DateTime.now(), longUrl, 0)).map(Right.apply)) { url =>

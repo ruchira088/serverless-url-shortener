@@ -3,8 +3,9 @@ package com.ruchij.dao
 import java.sql.Timestamp
 
 import com.ruchij.FutureOpt
-import com.ruchij.exceptions.DatabaseException
-import com.ruchij.monad.FutureM
+import com.ruchij.exceptions.{DatabaseException, EmptyOptionException}
+import com.ruchij.monad.FoldableMonadInMonad
+import com.ruchij.monad.Monad.futureMonad
 import com.ruchij.services.url.models.Url
 import org.joda.time.DateTime
 import slick.ast.BaseTypedType
@@ -44,18 +45,22 @@ class SlickUrlDao(val jdbcProfile: JdbcProfile, db: BasicBackend#DatabaseDef) ex
   override def insert(url: Url)(implicit executionContext: ExecutionContext): Future[Url] =
     for {
       _ <- db.run(urls += url)
-      insertedUrl <- fetch(url.key).flatten(DatabaseException("Unable to fetch persisted item"))
+      insertedUrl <-
+        fetch(url.key).flatten
+          .recoverWith {
+            case EmptyOptionException => Future.failed(DatabaseException("Unable to fetch persisted item"))
+          }
     }
     yield insertedUrl
 
   override def fetch(key: String)(implicit executionContext: ExecutionContext): FutureOpt[Url] =
-    FutureM {
+    FoldableMonadInMonad {
       db.run(urls.filter(_.key === key).result).map(_.headOption)
     }
 
   override def incrementHit(key: String)(implicit executionContext: ExecutionContext): FutureOpt[Url] =
     fetch(key)
-      .flatMapF {
+      .flatMapM {
         url => db.run(urls.filter(_.key === key).map(_.hits).update(url.hits + 1))
       }
       .flatMap { _ => fetch(key) }
