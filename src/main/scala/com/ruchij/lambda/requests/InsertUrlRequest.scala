@@ -4,6 +4,7 @@ import com.ruchij.exceptions.ValidationException
 import com.ruchij.monad.FoldableMonad.foldableMonadSequence
 import com.ruchij.monad.FoldableMonad.TryMonad.predicate
 import play.api.libs.json.{Json, OFormat}
+
 case class InsertUrlRequest(url: String)
 
 object InsertUrlRequest  {

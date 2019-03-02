@@ -60,6 +60,27 @@ functions:
           path: health-check
           method: get
 
+  insertUrl:
+    handler: com.ruchij.lambda.handlers.UrlInsertionHandler
+    events:
+      - http:
+          path: url
+          methond: post
+
+  urlInformation:
+    handler: com.ruchij.lambda.handlers.UrlInfoHandler
+    events:
+      - http:
+          path: url
+          method: get
+
+  redirectUrl:
+    handler: com.ruchij.lambda.handlers.UrlRedirectHandler
+    events:
+      - http:
+          path: redirect
+          method: get
+
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
