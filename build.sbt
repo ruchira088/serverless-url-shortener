@@ -23,7 +23,6 @@ lazy val root =
             awsLambdaJavaCore,
             awsLambdaJavaEvents,
             playJson,
-            dynamoDbSdk,
             slick,
             slickHikaricp,
             postgresql,

@@ -1,6 +1,5 @@
 package config
 
-import org.apache.commons.lang3.StringUtils
 import play.api.libs.json.{Json, OWrites}
 
 import scala.util.{Success, Try}
@@ -19,7 +18,7 @@ object EnvironmentVariables {
           }
       }
 
-  def mask(value: String, result: String = StringUtils.EMPTY): String =
+  def mask(value: String, result: String = ""): String =
     value.toList match {
       case Nil => result
       case x :: y :: z if z.length > 4 && result.isEmpty => mask(z.mkString, s"$x$y")
