@@ -24,6 +24,10 @@ object Dependencies {
 
   lazy val mysql = "mysql" % "mysql-connector-java" % "8.0.15"
 
+  lazy val sqlite = "org.xerial" % "sqlite-jdbc" % "3.25.2"
+
+  lazy val h2 = "com.h2database" % "h2" % "1.4.198"
+
   lazy val jodaTime = "joda-time" % "joda-time" % "2.10.1"
 
   lazy val googleGuice = "com.google.inject" % "guice" % "4.2.2"

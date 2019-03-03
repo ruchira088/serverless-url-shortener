@@ -11,3 +11,5 @@
 /terraform/.terraform
 
 /src/test/scala/com/ruchij/Playground.scala
+
+/play-server/.sqlite

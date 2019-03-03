@@ -12,6 +12,7 @@ import play.api.libs.json.Json
 import scala.util.Try
 
 class CoreModule extends AbstractModule {
+
   override def configure(): Unit = {
     implicit val environmentVariables: EnvironmentVariables = EnvironmentVariables(sys.env)
     val configuration = serviceConfiguration.get
@@ -29,12 +30,7 @@ class CoreModule extends AbstractModule {
     bind(classOf[BlockingExecutionContext]).to(classOf[BlockingExecutionContextImpl])
     bind(classOf[HashingService]).to(classOf[MurmurHashingService])
     bind(classOf[ServiceConfiguration]).toInstance(configuration)
-
-    databaseBinding()
   }
-
-  def databaseBinding(): Unit =
-    bind(classOf[UrlDao]).to(classOf[InMemoryUrlDao])
 
   def serviceConfiguration(implicit environmentVariables: EnvironmentVariables): Try[ServiceConfiguration] =
     for {
