@@ -8,7 +8,7 @@ import scala.util.{Success, Try}
 case class EnvironmentVariables(values: Map[String, String])
 
 object EnvironmentVariables {
-  val MASKED_KEYS: List[String] = List("POSTGRES_PASSWORD")
+  val MASKED_KEYS: List[String] = List("POSTGRES_PASSWORD", "MYSQL_PASSWORD")
 
   implicit val environmentVariablesWrites: OWrites[EnvironmentVariables] =
     (environmentVariables: EnvironmentVariables) =>

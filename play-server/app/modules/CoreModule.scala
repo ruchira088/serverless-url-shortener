@@ -1,18 +1,17 @@
 package modules
 import com.google.inject.AbstractModule
-import com.ruchij.dao.UrlDao
+import com.ruchij.dao.{InMemoryUrlDao, UrlDao}
 import com.ruchij.ec.BlockingExecutionContext
 import com.ruchij.services.hashing.{HashingService, MurmurHashingService}
 import com.ruchij.services.url.models.ServiceConfiguration
 import config.EnvironmentVariables.envValueAs
 import config.{EnvNames, EnvironmentVariables}
-import dao.PlaySlickUrlDao
 import ec.BlockingExecutionContextImpl
 import play.api.libs.json.Json
 
 import scala.util.Try
 
-class UrlShortenerModule extends AbstractModule {
+class CoreModule extends AbstractModule {
   override def configure(): Unit = {
     implicit val environmentVariables: EnvironmentVariables = EnvironmentVariables(sys.env)
     val configuration = serviceConfiguration.get
@@ -28,11 +27,14 @@ class UrlShortenerModule extends AbstractModule {
     }
 
     bind(classOf[BlockingExecutionContext]).to(classOf[BlockingExecutionContextImpl])
-    bind(classOf[UrlDao]).to(classOf[PlaySlickUrlDao])
-//    bind(classOf[UrlDao]).to(classOf[InMemoryUrlDao])
     bind(classOf[HashingService]).to(classOf[MurmurHashingService])
     bind(classOf[ServiceConfiguration]).toInstance(configuration)
+
+    databaseBinding()
   }
+
+  def databaseBinding(): Unit =
+    bind(classOf[UrlDao]).to(classOf[InMemoryUrlDao])
 
   def serviceConfiguration(implicit environmentVariables: EnvironmentVariables): Try[ServiceConfiguration] =
     for {

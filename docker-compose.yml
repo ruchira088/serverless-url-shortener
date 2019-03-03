@@ -7,8 +7,11 @@ services:
       - 9000:9000
       - 5005:5005
     tty: true
+#    command: "runWithPostgres"
+    command: "runWithMySQL"
     depends_on:
       - postgres-database
+      - mysql-database
     volumes:
       - "~/.sbt:/root/.sbt"
       - "~/.ivy2:/root/.ivy2"
@@ -18,11 +21,21 @@ services:
       - "/opt/url-shortener/project/target"
     environment:
       POSTGRES_URL: "jdbc:postgresql://postgres-database:5432/url-shortener"
-      POSTGRES_USER: "admin"
+      POSTGRES_USER: "urlShortener"
       POSTGRES_PASSWORD: "passw0rd"
+      MYSQL_URL: "jdbc:mysql://mysql-database:3306/url-shortener"
+      MYSQL_USER: "urlShortener"
+      MYSQL_PASSWORD: "passw0rd"
 
-#  dynamo-db:
-#    image: amazon/dynamodb-local
+  mysql-database:
+    image: mysql
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: "root-passw0rd"
+      MYSQL_DATABASE: "url-shortener"
+      MYSQL_USER: "urlShortener"
+      MYSQL_PASSWORD: "passw0rd"
 
   postgres-database:
     image: postgres
@@ -30,5 +43,5 @@ services:
       - 5432:5432
     environment:
       POSTGRES_DB: "url-shortener"
-      POSTGRES_USER: "admin"
+      POSTGRES_USER: "urlShortener"
       POSTGRES_PASSWORD: "passw0rd"

@@ -65,7 +65,7 @@ functions:
     events:
       - http:
           path: url
-          methond: post
+          method: post
 
   urlInformation:
     handler: com.ruchij.lambda.handlers.UrlInfoHandler

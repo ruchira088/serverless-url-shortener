@@ -14,6 +14,6 @@ EXPOSE 5005 9000
 
 COPY . .
 
-ENTRYPOINT ["sbt"]
+ENTRYPOINT ["sbt", "-jvm-debug", "5005", "playServer/compile"]
 
-CMD ["-jvm-debug", "5005", "playServer/compile", "playServer/run"]
+CMD ["playServer/run"]

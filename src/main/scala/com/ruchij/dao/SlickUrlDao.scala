@@ -28,7 +28,7 @@ class SlickUrlDao(val jdbcProfile: JdbcProfile, db: BasicBackend#DatabaseDef) ex
         timestamp => new DateTime(timestamp.getTime)
       )
 
-    def key: Rep[String] = column[String]("key", O.PrimaryKey)
+    def key: Rep[String] = column[String]("url_key", O.PrimaryKey)
 
     def createdAt: Rep[DateTime] = column[DateTime]("created_at")
 

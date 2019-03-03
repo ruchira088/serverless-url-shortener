@@ -22,6 +22,8 @@ object Dependencies {
 
   lazy val postgresql = "org.postgresql" % "postgresql" % "42.2.5"
 
+  lazy val mysql = "mysql" % "mysql-connector-java" % "8.0.15"
+
   lazy val jodaTime = "joda-time" % "joda-time" % "2.10.1"
 
   lazy val googleGuice = "com.google.inject" % "guice" % "4.2.2"

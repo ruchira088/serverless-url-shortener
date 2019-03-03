@@ -12,6 +12,10 @@ lazy val root =
         version := "0.0.1",
         scalaVersion := SCALA_VERSION,
         assemblyJarName in assembly := "serverless-url-shortener.jar",
+        assemblyMergeStrategy in assembly := {
+          case PathList("META-INF", _*) => MergeStrategy.discard
+          case _ => MergeStrategy.first
+        },
         buildInfoKeys := BuildInfoKey.ofN(name, organization, version, scalaVersion, sbtVersion),
         buildInfoPackage := "com.ruchij.eed3si9n",
         libraryDependencies ++=
@@ -38,7 +42,7 @@ lazy val playServer =
         scalaVersion := SCALA_VERSION,
         buildInfoKeys := BuildInfoKey.ofN(name, organization, version, scalaVersion, sbtVersion),
         buildInfoPackage := "com.ruchij.eed3si9n.play",
-        libraryDependencies ++= Seq(guice, ws, playSlick, playSlickEvolutions, postgresql)
+        libraryDependencies ++= Seq(guice, ws, playSlick, playSlickEvolutions, postgresql, mysql)
       )
       .dependsOn(root)
 
@@ -49,3 +53,7 @@ serverlessDeploy := {
   }
 
 addCommandAlias("deploy", ";assembly ;serverlessDeploy")
+
+addCommandAlias("runWithMySQL", "playServer/run -Dconfig.file=play-server/conf/application.mysql.conf")
+
+addCommandAlias("runWithPostgres", "playServer/run -Dconfig.file=play-server/conf/application.postgres.conf")

@@ -1,9 +1,9 @@
 # ---!Ups
 CREATE TABLE url(
-  key VARCHAR(255) NOT NULL PRIMARY KEY,
+  url_key VARCHAR(255) NOT NULL PRIMARY KEY,
   created_at TIMESTAMP NOT NULL,
-  long_url TEXT NOT NULL,
-  hits REAL NOT NULL
+  long_url VARCHAR(2047) NOT NULL,
+  hits INT NOT NULL
 );
 
 # ---!Downs

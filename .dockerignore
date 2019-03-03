@@ -8,4 +8,6 @@
 
 /.serverless
 
+/terraform/.terraform
+
 /src/test/scala/com/ruchij/Playground.scala
