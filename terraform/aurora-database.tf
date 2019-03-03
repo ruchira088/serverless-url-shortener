@@ -16,7 +16,10 @@ terraform {
   }
 }
 
-resource "random_uuid" "database_username" {}
+resource "random_string" "database_username" {
+  length = 16
+  special = false
+}
 
 resource "random_string" "database_password" {
   length = 32
@@ -27,8 +30,8 @@ resource "aws_rds_cluster" "database_cluster" {
   cluster_identifier = "shortened-url"
   engine = "aurora"
   engine_mode = "serverless"
-  database_name = "shortened-urls"
-  master_username = "${random_uuid.database_username.result}"
+  database_name = "shortenedUrls"
+  master_username = "${random_string.database_username.result}"
   master_password = "${random_string.database_password.result}"
   kms_key_id = "${aws_kms_key.kms_key.arn}"
   db_subnet_group_name = "${aws_db_subnet_group.database_subnet_group.name}"
@@ -40,6 +43,8 @@ resource "aws_rds_cluster" "database_cluster" {
 }
 
 resource "aws_security_group" "database_security_group" {
+  vpc_id = "${var.vpc_id}"
+
   ingress {
     from_port = 3306
     protocol = "TCP"
@@ -74,7 +79,7 @@ output "database_endpoint" {
 }
 
 output "database_username" {
-  value = "${random_uuid.database_username.result}"
+  value = "${random_string.database_username.result}"
 }
 
 output "database_password" {
