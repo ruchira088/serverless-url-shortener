@@ -3,9 +3,20 @@ import Dependencies._
 import scala.language.postfixOps
 import scala.sys.process._
 
+lazy val macroUtilities =
+    (project in file("./macro-utils"))
+      .settings(
+        name := "macro-utilities",
+        organization := "com.ruchij",
+        version := "0.0.1",
+        scalaVersion := SCALA_VERSION,
+        libraryDependencies ++= Seq(typesafeConfig, scalaReflect)
+      )
+
 lazy val root =
     (project in file("."))
       .enablePlugins(BuildInfoPlugin)
+      .dependsOn(macroUtilities)
       .settings(
         name := "serverless-url-shortener",
         organization := "com.ruchij",
@@ -25,7 +36,8 @@ lazy val root =
             playJson,
             slick,
             slickHikaricp,
-            postgresql,
+            mysql,
+            typesafeConfig,
             jodaTime,
             googleGuice
           )

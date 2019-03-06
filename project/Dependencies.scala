@@ -4,6 +4,8 @@ object Dependencies {
 
   val SCALA_VERSION = "2.12.8"
 
+  lazy val scalaReflect = "org.scala-lang" % "scala-reflect" % SCALA_VERSION
+
   lazy val awsLambdaJavaEvents = "com.amazonaws" % "aws-lambda-java-events" % "2.2.5"
 
   lazy val awsLambdaJavaCore = "com.amazonaws" % "aws-lambda-java-core" % "1.2.0"
@@ -29,4 +31,6 @@ object Dependencies {
   lazy val jodaTime = "joda-time" % "joda-time" % "2.10.1"
 
   lazy val googleGuice = "com.google.inject" % "guice" % "4.2.2"
+
+  lazy val typesafeConfig = "com.typesafe" % "config" % "1.3.3"
 }

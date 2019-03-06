@@ -1,5 +1,6 @@
 package config
 
+import com.ruchij.general.Constants
 import play.api.libs.json.{Json, OWrites}
 
 import scala.util.{Success, Try}
@@ -18,7 +19,7 @@ object EnvironmentVariables {
           }
       }
 
-  def mask(value: String, result: String = ""): String =
+  def mask(value: String, result: String = Constants.EMPTY_STRING): String =
     value.toList match {
       case Nil => result
       case x :: y :: z if z.length > 4 && result.isEmpty => mask(z.mkString, s"$x$y")

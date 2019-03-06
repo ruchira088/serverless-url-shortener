@@ -11,7 +11,7 @@ import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class InMemoryUrlDao @Inject()(var concurrentHashMap: ConcurrentHashMap[Url, Unit]) extends UrlDao {
+class InMemoryUrlDao @Inject()(@volatile var concurrentHashMap: ConcurrentHashMap[Url, Unit]) extends UrlDao {
   override def insert(url: Url)(implicit executionContext: ExecutionContext): Future[Url] = {
     concurrentHashMap.put(url, (): Unit)
     Option(concurrentHashMap.get(url))
