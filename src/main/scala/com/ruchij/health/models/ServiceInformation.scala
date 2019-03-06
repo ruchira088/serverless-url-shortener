@@ -1,6 +1,8 @@
 package com.ruchij.health.models
 
 import com.ruchij.eed3si9n.BuildInfo
+import com.ruchij.json.JsonFormats.dateTimeFormat
+import org.joda.time.DateTime
 import play.api.libs.json.{Json, OFormat}
 
 import scala.util.Properties
@@ -11,7 +13,8 @@ case class ServiceInformation(
   version: String,
   javaVersion: String,
   scalaVersion: String,
-  sbtVersion: String
+  sbtVersion: String,
+  timestamp: DateTime
 )
 
 object ServiceInformation {
@@ -24,6 +27,7 @@ object ServiceInformation {
       BuildInfo.version,
       Properties.javaVersion,
       BuildInfo.scalaVersion,
-      BuildInfo.sbtVersion
+      BuildInfo.sbtVersion,
+      DateTime.now()
     )
 }

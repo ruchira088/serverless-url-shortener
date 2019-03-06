@@ -1,5 +1,8 @@
 package web.responses
+
 import com.ruchij.eed3si9n.play.BuildInfo
+import com.ruchij.json.JsonFormats.dateTimeFormat
+import org.joda.time.DateTime
 import play.api.libs.json.{Json, OFormat}
 
 import scala.util.Properties
@@ -10,7 +13,8 @@ case class PlayServerInformation(
   version: String,
   javaVersion: String,
   sbtVersion: String,
-  scalaVersion: String
+  scalaVersion: String,
+  timestamp: DateTime
 )
 
 object PlayServerInformation {
@@ -23,6 +27,7 @@ object PlayServerInformation {
       BuildInfo.version,
       Properties.javaVersion,
       BuildInfo.sbtVersion,
-      BuildInfo.scalaVersion
+      BuildInfo.scalaVersion,
+      DateTime.now()
     )
 }
