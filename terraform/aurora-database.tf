@@ -59,7 +59,7 @@ resource "aws_security_group" "database_security_group" {
 }
 
 resource "aws_db_subnet_group" "database_subnet_group" {
-  subnet_ids = "${var.subnet_ids}"
+  subnet_ids = ["${data.aws_subnet_ids.vpc_subnets.ids}"]
 
   tags {
     Name = "shortened-url-database-subnet-group"
@@ -72,6 +72,10 @@ resource "aws_kms_key" "kms_key" {
   tags {
     Name = "shortened-url-database-kms-key"
   }
+}
+
+output "database_name" {
+  value = "${aws_rds_cluster.database_cluster.database_name}"
 }
 
 output "database_endpoint" {

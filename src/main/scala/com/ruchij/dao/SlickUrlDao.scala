@@ -9,7 +9,7 @@ import com.ruchij.monad.Monad.futureMonad
 import com.ruchij.services.url.models.Url
 import org.joda.time.DateTime
 import slick.ast.BaseTypedType
-import slick.basic.BasicBackend
+import slick.basic.{BasicBackend, DatabaseConfig}
 import slick.jdbc.{JdbcProfile, JdbcType}
 import slick.lifted.ProvenShape
 
@@ -68,4 +68,9 @@ class SlickUrlDao(val jdbcProfile: JdbcProfile, db: BasicBackend#DatabaseDef) ex
 
 object SlickUrlDao {
   val TABLE_NAME = "url"
+
+  def apply(): SlickUrlDao = {
+    val databaseConfig = DatabaseConfig.forConfig[JdbcProfile]("auroraServerless")
+    new SlickUrlDao(databaseConfig.profile, databaseConfig.db)
+  }
 }

@@ -4,7 +4,7 @@ import java.net.HttpURLConnection.HTTP_MOVED_TEMP
 
 import com.amazonaws.services.lambda.runtime.{Context, RequestHandler}
 import com.google.common.net.HttpHeaders
-import com.ruchij.dao.InMemoryUrlDao
+import com.ruchij.dao.{InMemoryUrlDao, SlickUrlDao}
 import com.ruchij.ec.ServerlessBlockExecutionContext.blockingExecutionContext
 import com.ruchij.lambda.handlers.HandlerUtils._
 import com.ruchij.lambda.handlers.UrlRedirectHandler.redirect
@@ -23,7 +23,7 @@ class UrlRedirectHandler extends RequestHandler[Request, Response] {
     Await.result(
       redirect(
         request,
-        new UrlShorteningService(InMemoryUrlDao(), new MurmurHashingService, ServiceConfiguration.default)
+        new UrlShorteningService(SlickUrlDao(), new MurmurHashingService, ServiceConfiguration.default)
       ),
       Duration.Inf
     )
