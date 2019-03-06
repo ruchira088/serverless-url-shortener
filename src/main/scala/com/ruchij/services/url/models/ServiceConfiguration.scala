@@ -7,5 +7,5 @@ object ServiceConfiguration {
   implicit val serviceConfigurationFormat: OFormat[ServiceConfiguration] =
     Json.format[ServiceConfiguration]
 
-  val default = ServiceConfiguration(6, 100)
+  val default = ServiceConfiguration(5, 50)
 }

@@ -21,6 +21,15 @@ provider:
   name: aws
   region: ap-southeast-2
   runtime: java8
+  vpc:
+    securityGroupIds:
+      - ${env:SERVERLESS_SECURITY_GROUP}
+    subnetIds:
+      - ${env:PUBLIC_SUBNET}
+  environment:
+    MYSQL_URL: ${env:MYSQL_URL}
+    MYSQL_USER: ${env:MYSQL_USER}
+    MYSQL_PASSWORD: ${env:MYSQL_PASSWORD}
 
 # you can overwrite defaults here
 #  stage: dev

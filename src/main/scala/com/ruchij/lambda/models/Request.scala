@@ -11,7 +11,10 @@ class Request(var body: Option[String], var headers: Map[String, AnyRef], var pa
     body = Option(requestBody)
 
   def setHeaders(requestHeaders: java.util.Map[String, AnyRef]): Unit =
-    headers  = Map(requestHeaders.asScala.toList: _*)
+    Option(requestHeaders).foreach {
+      headerValues =>
+        headers = Map(headerValues.asScala.toList: _*)
+    }
 
   def setPath(requestPath: String): Unit =
     path = requestPath
