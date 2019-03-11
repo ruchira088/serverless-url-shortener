@@ -1,7 +1,7 @@
 package com.ruchij.services.url
 
 import com.ruchij.dao.UrlDao
-import com.ruchij.exceptions.MissingUrlKeyException
+import com.ruchij.exceptions.{ExistingUrlKeyException, MissingUrlKeyException}
 import com.ruchij.general.Constants
 import com.ruchij.services.hashing.HashingService
 import com.ruchij.services.url.UrlShorteningService.mapper
@@ -25,6 +25,16 @@ class UrlShorteningService @Inject()(
 
   def insert(longUrl: String)(implicit executionContext: ExecutionContext): Future[Either[Url, Url]] =
     insert(longUrl, Constants.EMPTY_STRING, serviceConfiguration.keyLength, serviceConfiguration.fixedKeyLengthRetries)
+
+  def insert(key: String, longUrl: String)(implicit executionContext: ExecutionContext): Future[Either[Url, Url]] =
+    urlDao.fetch(key).value
+      .flatMap {
+        case None =>
+          urlDao.insert(Url(key, DateTime.now(), longUrl, 0)).map(Right.apply)
+
+        case Some(url) =>
+          if (url.longUrl == longUrl) Future.successful(Left(url)) else Future.failed(ExistingUrlKeyException(key))
+      }
 
   private def insert(longUrl: String, suffix: String, keySize: Int, remaining: Int)(
     implicit executionContext: ExecutionContext

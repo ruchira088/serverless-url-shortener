@@ -9,6 +9,7 @@ import com.ruchij.ec.ServerlessBlockExecutionContext.blockingExecutionContext
 import com.ruchij.lambda.handlers.HandlerUtils._
 import com.ruchij.lambda.handlers.UrlRedirectHandler.redirect
 import com.ruchij.lambda.models.{Request, Response}
+import com.ruchij.lambda.responses.ResponseHandler.handleExceptions
 import com.ruchij.services.hashing.MurmurHashingService
 import com.ruchij.services.url.UrlShorteningService
 import com.ruchij.services.url.models.ServiceConfiguration
@@ -33,8 +34,10 @@ object UrlRedirectHandler {
   def redirect(request: Request, urlShorteningService: UrlShorteningService)(
     implicit executionContext: ExecutionContext
   ): Future[Response] =
-    for {
-      key <- fromTry { extractKey(keyRegex(RedirectPrefix))(request.path) }
-      url <- urlShorteningService.fetch(key)
-    } yield Response(HTTP_MOVED_TEMP, Json.obj(), Map(HttpHeaders.LOCATION -> url.longUrl))
+    handleExceptions {
+      for {
+        key <- fromTry { extractKey(RedirectPrefix)(request.path) }
+        url <- urlShorteningService.fetch(key)
+      } yield Response(HTTP_MOVED_TEMP, Json.obj(), Map(HttpHeaders.LOCATION -> url.longUrl))
+    }
 }

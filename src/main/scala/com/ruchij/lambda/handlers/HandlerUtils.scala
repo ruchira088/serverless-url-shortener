@@ -1,29 +1,30 @@
 package com.ruchij.lambda.handlers
-import com.ruchij.config.ConfigLoader
 import com.ruchij.exceptions.ValidationException
-import com.ruchij.services.url.models.ServiceConfiguration
-import com.typesafe.config.ConfigFactory
 
-import scala.util.{Failure, Success, Try}
 import scala.util.matching.Regex
+import scala.util.{Failure, Success, Try}
 
 object HandlerUtils {
   sealed trait PathPrefix {
-    def path: String
+    self =>
+
+    val path: String
+    lazy val regex: Regex = keyRegex(self)
   }
 
   case object InfoPrefix extends PathPrefix {
-    override def path: String = "url"
+    override val path: String = "url"
   }
 
   case object RedirectPrefix extends PathPrefix {
-    override def path: String = "key"
+    override val path: String = "redirect"
   }
 
   def keyRegex(pathPrefix: PathPrefix): Regex = s"""\\/${pathPrefix.path}\\/([A-Za-z0-9_\\-\\.\\+]+)""".r
 
-  def extractKey(regex: Regex): PartialFunction[String, Try[String]] = {
-    case regex(key) => Success(key)
-    case path => Failure(ValidationException(s"Unable to extract key from $path"))
+  def extractKey(pathPrefix: PathPrefix): PartialFunction[String, Try[String]] = {
+    case pathPrefix.regex(key) => Success(key)
+    case path =>
+      Failure(ValidationException(s"""Unable to extract "${pathPrefix.path}" from $path"""))
   }
 }

@@ -12,6 +12,6 @@ class HealthCheckHandler extends RequestHandler[Request, Response] {
     Response(
       HttpURLConnection.HTTP_OK,
       Json.toJsObject(ServiceInformation()),
-      Map.empty
+      Map.empty[String, AnyRef]
     )
 }

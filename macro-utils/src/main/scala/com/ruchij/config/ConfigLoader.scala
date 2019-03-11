@@ -29,7 +29,7 @@ object ConfigLoader {
         .foldLeft(q"scala.util.Success(scala.collection.immutable.List.empty)") {
           (paramValues, configValue) =>
             q"""
-               $paramValues.flatMap(values => $configValue.map(_ :: values))
+               $paramValues.flatMap(values => $configValue.map(values :+ _))
              """
         }
 
