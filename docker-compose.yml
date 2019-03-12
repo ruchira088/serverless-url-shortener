@@ -8,10 +8,12 @@ services:
       - 5005:5005
     tty: true
 #    command: "runWithPostgres"
-    command: "runWithMySQL"
-    depends_on:
-      - postgres-database
-      - mysql-database
+#    command: "runWithMySQL"
+    command: "runWithMongo"
+#    depends_on:
+#      - postgres-database
+#      - mysql-database
+#      - mongo-database
     volumes:
       - "~/.sbt:/root/.sbt"
       - "~/.ivy2:/root/.ivy2"
@@ -26,22 +28,28 @@ services:
       MYSQL_URL: "jdbc:mysql://mysql-database:3306/url-shortener"
       MYSQL_USER: "urlShortener"
       MYSQL_PASSWORD: "passw0rd"
+      MONGO_URL: "mongodb://mongo-database:27017/url-shortener"
 
-  mysql-database:
-    image: mysql
-    ports:
-      - 3306:3306
-    environment:
-      MYSQL_ROOT_PASSWORD: "root-passw0rd"
-      MYSQL_DATABASE: "url-shortener"
-      MYSQL_USER: "urlShortener"
-      MYSQL_PASSWORD: "passw0rd"
+#  mysql-database:
+#    image: mysql
+#    ports:
+#      - 3306:3306
+#    environment:
+#      MYSQL_ROOT_PASSWORD: "root-passw0rd"
+#      MYSQL_DATABASE: "url-shortener"
+#      MYSQL_USER: "urlShortener"
+#      MYSQL_PASSWORD: "passw0rd"
+#
+#  postgres-database:
+#    image: postgres
+#    ports:
+#      - 5432:5432
+#    environment:
+#      POSTGRES_DB: "url-shortener"
+#      POSTGRES_USER: "urlShortener"
+#      POSTGRES_PASSWORD: "passw0rd"
 
-  postgres-database:
-    image: postgres
+  mongo-database:
+    image: mongo
     ports:
-      - 5432:5432
-    environment:
-      POSTGRES_DB: "url-shortener"
-      POSTGRES_USER: "urlShortener"
-      POSTGRES_PASSWORD: "passw0rd"
+      - 27017:27017
