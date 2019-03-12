@@ -54,7 +54,7 @@ class SlickUrlDao(val jdbcProfile: JdbcProfile, db: BasicBackend#DatabaseDef) ex
     yield insertedUrl
 
   override def fetch(key: String)(implicit executionContext: ExecutionContext): FutureOpt[Url] =
-    FoldableMonadInMonad {
+    FutureOpt {
       db.run(urls.filter(_.key === key).result).map(_.headOption)
     }
 
