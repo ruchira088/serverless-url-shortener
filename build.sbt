@@ -50,6 +50,7 @@ lazy val playServer =
       .settings(
         name := "play-url-shortener",
         organization := "com.ruchij",
+        maintainer := "ruchira088@gmail.com",
         version := "0.0.1",
         scalaVersion := SCALA_VERSION,
         buildInfoKeys := BuildInfoKey.ofN(name, organization, version, scalaVersion, sbtVersion),
