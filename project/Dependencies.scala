@@ -30,6 +30,8 @@ object Dependencies {
 
   lazy val playReactiveMongo = "org.reactivemongo" %% "play2-reactivemongo" % "0.16.3-play26"
 
+  lazy val redisScala = "com.github.etaty" %% "rediscala" % "1.8.0"
+
   lazy val jodaTime = "joda-time" % "joda-time" % "2.10.1"
 
   lazy val googleGuice = "com.google.inject" % "guice" % "4.2.2"

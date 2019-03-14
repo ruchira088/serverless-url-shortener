@@ -1,7 +1,7 @@
 package com.ruchij.dao
 
 import com.ruchij.FutureOpt
-import com.ruchij.dao.ReactiveMongoDao.MongoDatabase
+import com.ruchij.dao.ReactiveMongoUrlDao.MongoDatabase
 import com.ruchij.exceptions.{DatabaseException, EmptyOptionException}
 import com.ruchij.monad.FoldableMonad.TryMonad.predicate
 import com.ruchij.services.url.models.Url
@@ -15,7 +15,7 @@ import reactivemongo.play.json.collection.JSONCollection
 import scala.concurrent.Future.fromTry
 import scala.concurrent.{ExecutionContext, Future}
 
-class ReactiveMongoDao @Inject()(mongoDatabase: MongoDatabase) extends UrlDao {
+class ReactiveMongoUrlDao @Inject()(mongoDatabase: MongoDatabase) extends UrlDao {
   def urls(implicit executionContext: ExecutionContext): Future[JSONCollection] =
     mongoDatabase.database.map(_.collection[JSONCollection](mongoDatabase.collectionName))
 
@@ -51,6 +51,6 @@ class ReactiveMongoDao @Inject()(mongoDatabase: MongoDatabase) extends UrlDao {
     }
 }
 
-object ReactiveMongoDao {
+object ReactiveMongoUrlDao {
   case class MongoDatabase(database: Future[DefaultDB], collectionName: String = "urls")
 }
