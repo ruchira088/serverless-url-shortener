@@ -38,9 +38,14 @@ lazy val root =
             slickHikaricp,
             mysql,
             playReactiveMongo,
+            redisScala,
             typesafeConfig,
             jodaTime,
-            googleGuice
+            googleGuice,
+            postgresql,
+            mysql,
+            sqlite,
+            h2
           )
       )
 
@@ -56,7 +61,7 @@ lazy val playServer =
         buildInfoKeys := BuildInfoKey.ofN(name, organization, version, scalaVersion, sbtVersion),
         buildInfoPackage := "com.ruchij.eed3si9n.play",
         libraryDependencies ++=
-          Seq(guice, ws, playSlick, playSlickEvolutions, postgresql, mysql, sqlite, h2, playReactiveMongo)
+          Seq(guice, ws, playSlick, playSlickEvolutions, playReactiveMongo)
       )
       .dependsOn(root)
 
@@ -77,3 +82,5 @@ addCommandAlias("runWithSQLite", "playServer/run")
 addCommandAlias("runWithH2", "playServer/run -Dconfig.file=play-server/conf/application.h2.conf")
 
 addCommandAlias("runWithMongo", "playServer/run -Dconfig.file=play-server/conf/application.mongo.conf")
+
+addCommandAlias("runWithRedis", "playServer/run -Dconfig.file=play-server/conf/application.redis.conf")
