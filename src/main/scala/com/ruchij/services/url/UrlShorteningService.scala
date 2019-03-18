@@ -1,11 +1,11 @@
 package com.ruchij.services.url
-
+import com.ruchij.config.service.ServiceConfiguration
 import com.ruchij.dao.UrlDao
 import com.ruchij.exceptions.{ExistingUrlKeyException, MissingUrlKeyException}
 import com.ruchij.general.Constants
 import com.ruchij.services.hashing.HashingService
 import com.ruchij.services.url.UrlShorteningService.mapper
-import com.ruchij.services.url.models.{ServiceConfiguration, Url}
+import com.ruchij.services.url.models.Url
 import javax.inject.{Inject, Singleton}
 import org.joda.time.DateTime
 

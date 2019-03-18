@@ -1,10 +1,10 @@
 package modules
+
 import com.google.inject.{AbstractModule, Provides}
-import com.ruchij.config.ConfigLoader
+import com.ruchij.config.service.ServiceConfiguration
+import com.ruchij.configuration.ConfigLoader
 import com.ruchij.ec.BlockingExecutionContext
 import com.ruchij.services.hashing.{HashingService, MurmurHashingService}
-import com.ruchij.services.url.models.ServiceConfiguration
-import config.EnvironmentVariables
 import ec.BlockingExecutionContextImpl
 import javax.inject.Singleton
 import play.api.Configuration
@@ -13,12 +13,10 @@ import play.api.libs.json.Json
 class CoreModule extends AbstractModule {
 
   override def configure(): Unit = {
-    val environmentVariables: EnvironmentVariables = EnvironmentVariables(sys.env)
-
     println {
       s"""
         |Environment variables:
-        |${Json.prettyPrint(Json.toJson(environmentVariables))}
+        |${Json.prettyPrint(Json.toJson(sys.env))}
       """.stripMargin
     }
 
@@ -34,11 +32,10 @@ class CoreModule extends AbstractModule {
     println {
       s"""
         |Service configuration:
-        |${Json.prettyPrint(Json.toJson(serviceConfiguration))}
+        |${Json.prettyPrint(Json.toJson(serviceConfig))}
       """.stripMargin
     }
 
     serviceConfig
   }
-
 }

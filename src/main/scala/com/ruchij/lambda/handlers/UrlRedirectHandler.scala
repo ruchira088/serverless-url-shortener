@@ -4,7 +4,8 @@ import java.net.HttpURLConnection.HTTP_MOVED_TEMP
 
 import com.amazonaws.services.lambda.runtime.{Context, RequestHandler}
 import com.google.common.net.HttpHeaders
-import com.ruchij.dao.{InMemoryUrlDao, SlickUrlDao}
+import com.ruchij.config.service.ServiceConfiguration
+import com.ruchij.dao.SlickUrlDao
 import com.ruchij.ec.ServerlessBlockExecutionContext.blockingExecutionContext
 import com.ruchij.lambda.handlers.HandlerUtils._
 import com.ruchij.lambda.handlers.UrlRedirectHandler.redirect
@@ -12,7 +13,6 @@ import com.ruchij.lambda.models.{Request, Response}
 import com.ruchij.lambda.responses.ResponseHandler.handleExceptions
 import com.ruchij.services.hashing.MurmurHashingService
 import com.ruchij.services.url.UrlShorteningService
-import com.ruchij.services.url.models.ServiceConfiguration
 import play.api.libs.json.Json
 
 import scala.concurrent.Future.fromTry

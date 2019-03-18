@@ -45,7 +45,8 @@ lazy val root =
             postgresql,
             mysql,
             sqlite,
-            h2
+            h2,
+            elastic4sCore, elastic4sHttp, elastic4sPlayJson
           )
       )
 
@@ -84,3 +85,5 @@ addCommandAlias("runWithH2", "playServer/run -Dconfig.file=play-server/conf/appl
 addCommandAlias("runWithMongo", "playServer/run -Dconfig.file=play-server/conf/application.mongo.conf")
 
 addCommandAlias("runWithRedis", "playServer/run -Dconfig.file=play-server/conf/application.redis.conf")
+
+addCommandAlias("runWithES", "playServer/run -Dconfig.file=play-server/conf/application.elasticsearch.conf")

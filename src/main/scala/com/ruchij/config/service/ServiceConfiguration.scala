@@ -1,4 +1,5 @@
-package com.ruchij.services.url.models
+package com.ruchij.config.service
+
 import play.api.libs.json.{Json, OFormat}
 
 case class ServiceConfiguration(keyLength: Int, fixedKeyLengthRetries: Int)
