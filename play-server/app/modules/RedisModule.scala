@@ -1,9 +1,9 @@
 package modules
 import akka.actor.ActorSystem
 import com.google.inject.{AbstractModule, Provides}
-import com.ruchij.config.ConfigLoader
 import com.ruchij.dao.{RedisUrlDao, UrlDao}
-import config.redis.RedisConfiguration
+import com.ruchij.config.redis.RedisConfiguration
+import com.ruchij.configuration.ConfigLoader
 import javax.inject.Singleton
 import play.api.Configuration
 import redis.RedisClient

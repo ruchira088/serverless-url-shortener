@@ -32,6 +32,14 @@ object Dependencies {
 
   lazy val redisScala = "com.github.etaty" %% "rediscala" % "1.8.0"
 
+  val ELASTIC4S_VERSION = "6.5.1"
+
+  lazy val elastic4sCore =  "com.sksamuel.elastic4s" %% "elastic4s-core" % ELASTIC4S_VERSION
+
+  lazy val elastic4sHttp = "com.sksamuel.elastic4s" %% "elastic4s-http" % ELASTIC4S_VERSION
+
+  lazy val elastic4sPlayJson =  "com.sksamuel.elastic4s" %% "elastic4s-play-json" % ELASTIC4S_VERSION
+
   lazy val jodaTime = "joda-time" % "joda-time" % "2.10.1"
 
   lazy val googleGuice = "com.google.inject" % "guice" % "4.2.2"

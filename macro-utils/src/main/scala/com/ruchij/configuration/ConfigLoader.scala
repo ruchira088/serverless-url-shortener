@@ -1,4 +1,5 @@
-package com.ruchij.config
+package com.ruchij.configuration
+
 import com.typesafe.config.Config
 
 import scala.language.experimental.macros
@@ -19,7 +20,7 @@ object ConfigLoader {
         .map {
           symbol =>
             q"""
-               com.ruchij.config.ConfigValueParser
+               ${typeOf[ConfigValueParser.type].termSymbol}
                 .getValue[${symbol.typeSignature}](
                   ${s"${wtt.tpe.typeSymbol.name.toString}.${symbol.name.toString}"},
                   ${config.tree}

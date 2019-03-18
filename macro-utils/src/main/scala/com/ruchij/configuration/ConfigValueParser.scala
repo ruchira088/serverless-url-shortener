@@ -1,4 +1,5 @@
-package com.ruchij.config
+package com.ruchij.configuration
+
 import com.typesafe.config.Config
 
 import scala.util.{Success, Try}
@@ -16,6 +17,9 @@ object ConfigValueParser {
 
   implicit val stringConfigValueParser: ConfigValueParser[String] =
     (path: String, config: Config) => Try(config.getString(path))
+
+  implicit val booleanConfigValueParser: ConfigValueParser[Boolean] =
+    (path: String, config: Config) => Try(config.getBoolean(path))
 
   implicit def optionConfigValueParser[A](implicit configValueParser: ConfigValueParser[A]): ConfigValueParser[Option[A]] =
     (path: String, config: Config) =>
