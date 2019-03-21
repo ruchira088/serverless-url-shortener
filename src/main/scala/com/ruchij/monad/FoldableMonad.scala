@@ -8,8 +8,6 @@ import scala.util.{Failure, Success, Try}
 trait FoldableMonad[F[+ _]] extends Monad[F] {
   def fold[A, B](onFailure: Failure => B)(onSuccess: A => B)(value: F[A]): B
 
-  def throwable(failure: Failure): Throwable
-
   def failureMessage[A](value: F[A]): Option[String] =
     fold[A, Option[Throwable]](failure => Some(throwable(failure)))(_ => None)(value).map(_.getMessage)
 }

@@ -4,3 +4,5 @@ POST    /url        web.controllers.UrlController.insert()
 GET     /url/:key   web.controllers.UrlController.info(key)
 
 GET     /redirect/:key   web.controllers.UrlController.redirect(key)
+
+GET     /url        web.controllers.UrlController.fetchAll()

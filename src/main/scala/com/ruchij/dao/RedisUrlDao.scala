@@ -1,5 +1,7 @@
 package com.ruchij.dao
+
 import com.ruchij.FutureOpt
+import com.ruchij.general.Orderings.DateTimeOrdering
 import com.ruchij.services.url.models.Url
 import javax.inject.{Inject, Singleton}
 import redis.RedisClient
@@ -23,5 +25,14 @@ class RedisUrlDao @Inject()(redisClient: RedisClient) extends UrlDao {
     fetch(key)
       .flatMapM {
         url => insert(url.copy(hits = url.hits + 1))
+      }
+
+  override def fetchAll(page: Int, pageSize: Int)(implicit executionContext: ExecutionContext): Future[List[Url]] =
+    redisClient.keys("*")
+      .flatMap {
+        keys => Future.sequence(keys.toList.map(key => fetch(key).flatten))
+      }
+      .map {
+        _.sortBy(_.createdAt).slice(page * pageSize, (page + 1) * pageSize)
       }
 }

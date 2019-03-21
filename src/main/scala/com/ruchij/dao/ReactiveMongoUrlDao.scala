@@ -7,7 +7,7 @@ import com.ruchij.monad.FoldableMonad.TryMonad.predicate
 import com.ruchij.services.url.models.Url
 import javax.inject.Inject
 import play.api.libs.json._
-import reactivemongo.api.DefaultDB
+import reactivemongo.api.{Cursor, DefaultDB}
 import reactivemongo.play.json.ImplicitBSONHandlers.JsObjectDocumentWriter
 import reactivemongo.play.json.collection.JSONBatchCommands.FindAndModifyCommand.FindAndModifyResult
 import reactivemongo.play.json.collection.JSONCollection
@@ -41,13 +41,17 @@ class ReactiveMongoUrlDao @Inject()(mongoDatabase: MongoDatabase) extends UrlDao
     FutureOpt {
       urls
         .flatMap[FindAndModifyResult] {
-          _.findAndUpdate(
-            Json.obj("key" -> key),
-            Json.obj("$inc" -> Json.obj("hits" -> 1)),
-            fetchNewObject = true
-          )
+          _.findAndUpdate(Json.obj("key" -> key), Json.obj("$inc" -> Json.obj("hits" -> 1)), fetchNewObject = true)
         }
         .map(_.result[Url])
+    }
+  override def fetchAll(page: Int, pageSize: Int)(implicit executionContext: ExecutionContext): Future[List[Url]] =
+    urls.flatMap {
+      _.find(Json.obj(), Option.empty[JsObject])
+        .sort(Json.obj("createdAt" -> -1))
+        .skip(page * pageSize)
+        .cursor[Url]()
+        .collect(pageSize, Cursor.FailOnError[List[Url]]())
     }
 }
 

@@ -4,7 +4,6 @@ import java.sql.Timestamp
 
 import com.ruchij.FutureOpt
 import com.ruchij.exceptions.{DatabaseException, EmptyOptionException}
-import com.ruchij.monad.FoldableMonadInMonad
 import com.ruchij.monad.Monad.futureMonad
 import com.ruchij.services.url.models.Url
 import org.joda.time.DateTime
@@ -20,13 +19,13 @@ class SlickUrlDao(val jdbcProfile: JdbcProfile, db: BasicBackend#DatabaseDef) ex
 
   import jdbcProfile.api._
 
-  class Urls(tag: Tag) extends Table[Url](tag, SlickUrlDao.TABLE_NAME) {
+  implicit val dateTimeMapper: JdbcType[DateTime] with BaseTypedType[DateTime] =
+    MappedColumnType.base[DateTime, Timestamp](
+      dateTime => new Timestamp(dateTime.getMillis),
+      timestamp => new DateTime(timestamp.getTime)
+    )
 
-    implicit val dateTimeMapper: JdbcType[DateTime] with BaseTypedType[DateTime] =
-      MappedColumnType.base[DateTime, Timestamp](
-        dateTime => new Timestamp(dateTime.getMillis),
-        timestamp => new DateTime(timestamp.getTime)
-      )
+  class Urls(tag: Tag) extends Table[Url](tag, SlickUrlDao.TABLE_NAME) {
 
     def key: Rep[String] = column[String]("url_key", O.PrimaryKey)
 
@@ -64,6 +63,9 @@ class SlickUrlDao(val jdbcProfile: JdbcProfile, db: BasicBackend#DatabaseDef) ex
         url => db.run(urls.filter(_.key === key).map(_.hits).update(url.hits + 1))
       }
       .flatMap { _ => fetch(key) }
+
+  override def fetchAll(page: Int, pageSize: Int)(implicit executionContext: ExecutionContext): Future[List[Url]] =
+    db.run(urls.drop(page * pageSize).take(pageSize).sortBy(_.createdAt).result).map(_.toList)
 }
 
 object SlickUrlDao {

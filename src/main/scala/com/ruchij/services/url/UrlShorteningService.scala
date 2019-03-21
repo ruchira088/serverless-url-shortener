@@ -15,7 +15,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class UrlShorteningService @Inject()(
   urlDao: UrlDao,
   hashingService: HashingService,
-  serviceConfiguration: ServiceConfiguration
+  val serviceConfiguration: ServiceConfiguration
 ) {
   def fetch(key: String)(implicit executionContext: ExecutionContext): Future[Url] =
     urlDao.incrementHit(key).value.flatMap(mapper(key))
@@ -35,6 +35,9 @@ class UrlShorteningService @Inject()(
         case Some(url) =>
           if (url.longUrl == longUrl) Future.successful(Left(url)) else Future.failed(ExistingUrlKeyException(key))
       }
+
+  def fetchAll(page: Int, pageSize: Int)(implicit executionContext: ExecutionContext): Future[List[Url]] =
+    urlDao.fetchAll(page, pageSize)
 
   private def insert(longUrl: String, suffix: String, keySize: Int, remaining: Int)(
     implicit executionContext: ExecutionContext

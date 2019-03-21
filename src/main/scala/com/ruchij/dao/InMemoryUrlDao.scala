@@ -3,6 +3,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 import com.ruchij.FutureOpt
 import com.ruchij.exceptions.InMemoryDatabasePersistenceException
+import com.ruchij.general.Orderings.DateTimeOrdering
 import com.ruchij.monad.FoldableMonadInMonad
 import com.ruchij.services.url.models.Url
 import javax.inject.{Inject, Singleton}
@@ -27,15 +28,20 @@ class InMemoryUrlDao @Inject()(@volatile var concurrentHashMap: ConcurrentHashMa
 
   override def incrementHit(key: String)(implicit executionContext: ExecutionContext): FutureOpt[Url] =
     fetch(key)
-      .flatMapM {
-        url =>
-          insert(url.copy(hits = url.hits + 1))
-            .map {
-              newUrl =>
-                concurrentHashMap.remove(url)
-                newUrl
-            }
+      .flatMapM { url =>
+        insert(url.copy(hits = url.hits + 1))
+          .map { newUrl =>
+            concurrentHashMap.remove(url)
+            newUrl
+          }
       }
+
+  override def fetchAll(page: Int, pageSize: Int)(implicit executionContext: ExecutionContext): Future[List[Url]] =
+    Future.successful {
+      concurrentHashMap.keys().asScala.toList
+        .sortBy(_.createdAt)
+        .slice(page * pageSize, pageSize * (page + 1))
+    }
 }
 
 object InMemoryUrlDao {

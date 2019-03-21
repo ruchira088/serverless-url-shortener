@@ -7,13 +7,7 @@ services:
       - 9000:9000
       - 5005:5005
     tty: true
-#    command: "runWithPostgres"
-#    command: "runWithMySQL"
     command: "runWithES"
-#    depends_on:
-#      - postgres-database
-#      - mysql-database
-#      - mongo-database
     volumes:
       - "~/.sbt:/root/.sbt"
       - "~/.ivy2:/root/.ivy2"

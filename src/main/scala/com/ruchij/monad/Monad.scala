@@ -11,6 +11,8 @@ trait Monad[M[+ _]] extends Functor[M] {
     flatMap[A, B](a => lift(f(a)))(value)
 
   def failure(fail: Failure): M[Nothing]
+
+  def throwable(failure: Failure): Throwable
 }
 
 object Monad {
@@ -23,5 +25,7 @@ object Monad {
       override def failure(fail: Throwable): Future[Nothing] = Future.failed[Nothing](fail)
 
       override def lift[A](value: A): Future[A] = Future.successful(value)
+
+      override def throwable(failure: Throwable): Throwable = failure
     }
 }

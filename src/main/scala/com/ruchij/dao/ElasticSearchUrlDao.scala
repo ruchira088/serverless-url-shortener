@@ -13,7 +13,10 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ElasticSearchUrlDao @Inject()(elasticClient: ElasticClient, elasticSearchConfiguration: ElasticSearchConfiguration) extends UrlDao {
+class ElasticSearchUrlDao @Inject()(
+  elasticClient: ElasticClient,
+  elasticSearchConfiguration: ElasticSearchConfiguration
+) extends UrlDao {
   override def insert(url: Url)(implicit executionContext: ExecutionContext): Future[Url] =
     elasticClient
       .execute { indexInto(indexAndType(elasticSearchConfiguration)).doc(url) id url.key }
@@ -47,12 +50,26 @@ class ElasticSearchUrlDao @Inject()(elasticClient: ElasticClient, elasticSearchC
     fetch(key)
       .flatMapM { url =>
         val updatedUrl = url.copy(hits = url.hits + 1)
-        elasticClient.execute { update(key).in(indexAndType(elasticSearchConfiguration)).doc(updatedUrl) }
-          .flatMap {
-            response =>
-              response.fold[Future[Url]](Future.failed(ElasticException(response.error))) {
-              _ => Future.successful(updatedUrl)
+        elasticClient
+          .execute { update(key).in(indexAndType(elasticSearchConfiguration)).doc(updatedUrl) }
+          .flatMap { response =>
+            response.fold[Future[Url]](Future.failed(ElasticException(response.error))) { _ =>
+              Future.successful(updatedUrl)
             }
           }
       }
+
+  override def fetchAll(page: Int, pageSize: Int)(implicit executionContext: ExecutionContext): Future[List[Url]] =
+    elasticClient
+      .execute {
+        searchWithType(indexAndType(elasticSearchConfiguration))
+          .matchAllQuery()
+          .sortByFieldAsc("createdAt")
+          .start(page * pageSize)
+          .limit(pageSize)
+      }
+      .flatMap { response =>
+        Future.sequence(response.result.safeTo[Url].map(Future.fromTry))
+      }
+      .map(_.toList)
 }
