@@ -46,7 +46,7 @@ jobs:
 
   create_aws_resources:
     docker:
-      - image: node
+      - image: ubuntu
     steps:
       - run:
           name: Install terraform
@@ -57,6 +57,22 @@ jobs:
             unzip terraform.zip && rm terraform.zip && chmod +x terraform && \
             mv -f $PWD/terraform /usr/local/bin/
       - checkout
+
+  deploy_serverless:
+    docker:
+      - image: node
+    steps:
+      - run:
+          name: Install Serverless
+          command: npm install -g serverless
+      - attach_workspace:
+          at: resources
+      - run:
+          name: Check
+          command: |
+            apt update && apt install tree -y && tree
+
+
 
 workflows:
   version: 2
