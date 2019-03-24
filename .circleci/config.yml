@@ -38,6 +38,7 @@ jobs:
           root: .
           paths:
             - target/scala-2.12/serverless-url-shortener.jar
+            - terraform/output
       - save_cache:
           paths:
             - ~/.ivy2
@@ -56,6 +57,7 @@ jobs:
             curl -o terraform.zip https://releases.hashicorp.com/terraform/0.11.13/terraform_0.11.13_linux_amd64.zip && \
             unzip terraform.zip && rm terraform.zip && chmod +x terraform && \
             mv -f $PWD/terraform /usr/local/bin/
+      - checkout
       - attach_workspace:
           at: .
       - run:
@@ -71,12 +73,12 @@ jobs:
           name: Apply terraform
           command: |
             cd terraform && \
-            terraform plan -var="branch_name=${CIRCLE_BRANCH}" && terraform output -json > output.json && \
+            terraform plan -var="branch_name=${CIRCLE_BRANCH}" && terraform output -json > output/output.json && \
             cd ..
       - persist_to_workspace:
           root: .
           paths:
-            - terraform/output.json
+            - terraform/output/output.json
 
   deploy_serverless:
     docker:
