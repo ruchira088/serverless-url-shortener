@@ -72,8 +72,6 @@ jobs:
           command: |
             apt update && apt install tree -y && tree
 
-
-
 workflows:
   version: 2
   deploy:
@@ -82,5 +80,8 @@ workflows:
       - create_aws_resources:
           requires:
             - build_and_test
+      - deploy_serverless:
+          requires:
+            - create_aws_resources
 
 
