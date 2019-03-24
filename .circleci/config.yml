@@ -63,7 +63,7 @@ workflows:
   deploy:
     jobs:
       - build_and_test
-      - create_aws_resources
+      - create_aws_resources:
           requires:
             - build_and_test
 
