@@ -35,9 +35,9 @@ jobs:
           name: Build root project fat jar
           command: sbt assembly
       - persist_to_workspace:
-          root: .
+          root: target/scala-2.12/
           paths:
-            - target/scala-2.12/serverless-url-shortener.jar
+            - serverless-url-shortener.jar
       - save_cache:
           paths:
             - ~/.ivy2
@@ -71,9 +71,9 @@ jobs:
             mkdir output && terraform output -json > output/output.json && \
             cd ..
       - persist_to_workspace:
-          root: .
+          root: terraform
           paths:
-            - terraform/output/output.json
+            - output/output.json
 
   deploy_serverless:
     docker:
@@ -85,14 +85,16 @@ jobs:
       - run:
           name: Install jq
           command: |
-            apt update && apt install jq tree -y
+            apt update && apt install tree jq -y
       - checkout
       - attach_workspace:
           at: .
       - run:
+          name: Examine workspace
+          command: tree
+      - run:
           name: Check
-          command: |
-            tree
+          command: cat terraform/output/output.json
 
 workflows:
   version: 2
