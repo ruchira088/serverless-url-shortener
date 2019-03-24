@@ -15,7 +15,7 @@ databaseUrlParameter() {
 
 rm config/config.yml
 
-echo "mysqlUrl: $(databaseUrlParameter 'database_endpoint'):$(databaseUrlParameter 'database_port')/$(databaseUrlParameter database_name)" >> config/config.yml
+echo "mysqlUrl: jdbc:mysql://$(databaseUrlParameter 'database_endpoint'):$(databaseUrlParameter 'database_port')/$(databaseUrlParameter database_name)" >> config/config.yml
 configFile "mysqlUser" "database_username.value"
 configFile "mysqlPassword" "database_password.value"
 
