@@ -57,4 +57,12 @@ jobs:
             unzip terraform.zip && rm terraform.zip && chmod +x terraform && \
             mv -f $PWD/terraform /usr/local/bin/
 
+workflows:
+  version: 2
+  deploy:
+    jobs:
+      - build_and_test
+      - create_aws_resources
+          requires: build_and_test
+
 
