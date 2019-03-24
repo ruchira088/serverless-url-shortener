@@ -1,20 +1,20 @@
 
 provider "aws" {
   region = "ap-southeast-2"
-  version = "2.0"
+  version = "~> 2.0"
 }
 
 provider "random" {
-  version = "2.0"
+  version = "~> 2.0"
 }
 
-terraform {
-  backend "s3" {
-    region = "ap-southeast-2"
-    bucket = "terraform.ruchij.com"
-    key = "url-shortener.tfstate"
-  }
-}
+//terraform {
+//  backend "s3" {
+//    region = "ap-southeast-2"
+//    bucket = "terraform.ruchij.com"
+//    key = "url-shortener.tfstate"
+//  }
+//}
 
 resource "random_string" "database_username" {
   length = 16

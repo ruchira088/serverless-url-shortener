@@ -80,15 +80,23 @@ functions:
     handler: com.ruchij.lambda.handlers.UrlInfoHandler
     events:
       - http:
-          path: url
+          path: url/{key}
           method: get
+          request:
+            parameters:
+              paths:
+                key: true
 
   redirectUrl:
     handler: com.ruchij.lambda.handlers.UrlRedirectHandler
     events:
       - http:
-          path: redirect
+          path: redirect/{key}
           method: get
+          request:
+            parameters:
+              paths:
+                key: true
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
