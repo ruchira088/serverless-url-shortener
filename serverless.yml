@@ -25,7 +25,9 @@ provider:
     securityGroupIds:
       - ${env:SERVERLESS_SECURITY_GROUP}
     subnetIds:
-      - ${env:PUBLIC_SUBNET}
+      - ${env:LAMBDA_SUBNET_1}
+      - ${env:LAMBDA_SUBNET_2}
+      - ${env:LAMBDA_SUBNET_3}
   environment:
     MYSQL_URL: ${env:MYSQL_URL}
     MYSQL_USER: ${env:MYSQL_USER}

@@ -3,6 +3,6 @@ variable "vpc_id" {
   default = "vpc-0de0b71172da2ed54"
 }
 
-//variable "branch_name" {
-//  type = "string"
-//}
+variable "branch_name" {
+  type = "string"
+}

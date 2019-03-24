@@ -35,9 +35,9 @@ jobs:
           name: Build root project fat jar
           command: sbt assembly
       - persist_to_workspace:
-          root: target
+          root: .
           paths:
-            - scala-2.12/serverless-url-shortener.jar
+            - target/scala-2.12/serverless-url-shortener.jar
       - save_cache:
           paths:
             - ~/.ivy2
@@ -51,12 +51,29 @@ jobs:
       - run:
           name: Install terraform
           command: |
-            apt update && apt install curl unzip -y
+            apt update && apt install curl unzip jq gettext -y
 
             curl -o terraform.zip https://releases.hashicorp.com/terraform/0.11.13/terraform_0.11.13_linux_amd64.zip && \
             unzip terraform.zip && rm terraform.zip && chmod +x terraform && \
             mv -f $PWD/terraform /usr/local/bin/
-      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Create the terraform backend file
+          command: envsubst < terraform/backend.template > terraform/backend.tf
+      - run:
+          name: Initialize terraform
+          command: cd terraform && terraform init && cd ..
+      - run:
+          name: Apply terraform
+          command: |
+            cd terraform && \
+            terraform plan -var="branch_name=${CIRCLE_BRANCH}" && terraform output -json > output.json && \
+            cd ..
+      - persist_to_workspace:
+          root: .
+          paths:
+            - terraform/output.json
 
   deploy_serverless:
     docker:
@@ -65,9 +82,8 @@ jobs:
       - run:
           name: Install Serverless
           command: npm install -g serverless
-      - checkout
       - attach_workspace:
-          at: target
+          at: .
       - run:
           name: Check
           command: |

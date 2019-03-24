@@ -1,21 +1,4 @@
 
-provider "aws" {
-  region = "ap-southeast-2"
-  version = "~> 2.0"
-}
-
-provider "random" {
-  version = "~> 2.0"
-}
-
-//terraform {
-//  backend "s3" {
-//    region = "ap-southeast-2"
-//    bucket = "terraform.ruchij.com"
-//    key = "url-shortener.tfstate"
-//  }
-//}
-
 resource "random_string" "database_username" {
   length = 16
   special = false
@@ -27,7 +10,7 @@ resource "random_string" "database_password" {
 }
 
 resource "aws_rds_cluster" "database_cluster" {
-  cluster_identifier = "shortened-url"
+  cluster_identifier = "${var.branch_name}-shortened-url"
   engine = "aurora"
   engine_mode = "serverless"
   database_name = "shortenedUrls"
@@ -38,7 +21,7 @@ resource "aws_rds_cluster" "database_cluster" {
   vpc_security_group_ids = ["${aws_security_group.database_security_group.id}"]
 
   tags {
-    Name = "shortened-url"
+    Name = "${var.branch_name}-shortened-url"
   }
 }
 
@@ -50,19 +33,19 @@ resource "aws_security_group" "database_security_group" {
     protocol = "TCP"
     to_port = 3306
 
-    cidr_blocks = ["0.0.0.0/0"]
+    security_groups = ["${aws_security_group.lambda_security_group.id}"]
   }
 
   tags {
-    Name = "shortened-url-database-security-group"
+    Name = "${var.branch_name}-shortened-url-database-security-group"
   }
 }
 
 resource "aws_db_subnet_group" "database_subnet_group" {
-  subnet_ids = ["${data.aws_subnet_ids.vpc_subnets.ids}"]
+  subnet_ids = ["${data.aws_subnet_ids.aws_data_subnet_ids.ids}"]
 
   tags {
-    Name = "shortened-url-database-subnet-group"
+    Name = "${var.branch_name}-shortened-url-database-subnet-group"
   }
 }
 
@@ -70,7 +53,7 @@ resource "aws_kms_key" "kms_key" {
   description = "KMS key for the shortened URL database"
 
   tags {
-    Name = "shortened-url-database-kms-key"
+    Name = "${var.branch_name}-shortened-url-database-kms-key"
   }
 }
 
