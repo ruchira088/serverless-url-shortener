@@ -51,13 +51,16 @@ jobs:
       - run:
           name: Install terraform
           command: |
-            apt update && apt install curl unzip jq gettext -y
+            apt update && apt install curl unzip jq tree gettext -y
 
             curl -o terraform.zip https://releases.hashicorp.com/terraform/0.11.13/terraform_0.11.13_linux_amd64.zip && \
             unzip terraform.zip && rm terraform.zip && chmod +x terraform && \
             mv -f $PWD/terraform /usr/local/bin/
       - attach_workspace:
           at: .
+      - run:
+          name: Observe file structure
+          command: tree
       - run:
           name: Create the terraform backend file
           command: envsubst < terraform/backend.template > terraform/backend.tf
