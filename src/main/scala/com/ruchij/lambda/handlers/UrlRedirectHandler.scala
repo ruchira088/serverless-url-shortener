@@ -11,6 +11,7 @@ import com.ruchij.lambda.handlers.HandlerUtils._
 import com.ruchij.lambda.handlers.UrlRedirectHandler.redirect
 import com.ruchij.lambda.models.{Request, Response}
 import com.ruchij.lambda.responses.ResponseHandler.handleExceptions
+import com.ruchij.providers.Providers
 import com.ruchij.services.hashing.MurmurHashingService
 import com.ruchij.services.url.UrlShorteningService
 import play.api.libs.json.Json
@@ -24,7 +25,7 @@ class UrlRedirectHandler extends RequestHandler[Request, Response] {
     Await.result(
       redirect(
         request,
-        new UrlShorteningService(SlickUrlDao(), new MurmurHashingService, ServiceConfiguration.default)
+        new UrlShorteningService(SlickUrlDao(), new MurmurHashingService)(ServiceConfiguration.default, Providers)
       ),
       Duration.Inf
     )

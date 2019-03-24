@@ -20,6 +20,10 @@ object HandlerUtils {
     override val path: String = "redirect"
   }
 
+  case object DeleteSecretPrefix extends PathPrefix {
+    override val path: String = "delete-secret"
+  }
+
   def keyRegex(pathPrefix: PathPrefix): Regex = s"""\\/${pathPrefix.path}\\/([A-Za-z0-9_\\-\\.\\+]+)""".r
 
   def extractKey(pathPrefix: PathPrefix): PartialFunction[String, Try[String]] = {

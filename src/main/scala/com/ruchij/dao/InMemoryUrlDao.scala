@@ -5,6 +5,8 @@ import com.ruchij.FutureOpt
 import com.ruchij.exceptions.InMemoryDatabasePersistenceException
 import com.ruchij.general.Orderings.DateTimeOrdering
 import com.ruchij.monad.FoldableMonadInMonad
+import com.ruchij.monad.Monad.futureMonad
+import com.ruchij.monad.FoldableMonad.OptionMonad
 import com.ruchij.services.url.models.Url
 import javax.inject.{Inject, Singleton}
 
@@ -38,9 +40,19 @@ class InMemoryUrlDao @Inject()(@volatile var concurrentHashMap: ConcurrentHashMa
 
   override def fetchAll(page: Int, pageSize: Int)(implicit executionContext: ExecutionContext): Future[List[Url]] =
     Future.successful {
-      concurrentHashMap.keys().asScala.toList
+      concurrentHashMap
+        .keys()
+        .asScala
+        .toList
         .sortBy(_.createdAt)
         .slice(page * pageSize, pageSize * (page + 1))
+    }
+
+  override def delete(key: String)(implicit executionContext: ExecutionContext): FutureOpt[Url] =
+    fetch(key).map {
+      url =>
+        concurrentHashMap.remove(url.key)
+        url
     }
 }
 

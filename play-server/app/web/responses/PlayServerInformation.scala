@@ -2,6 +2,7 @@ package web.responses
 
 import com.ruchij.eed3si9n.play.BuildInfo
 import com.ruchij.json.JsonFormats.dateTimeFormat
+import com.ruchij.providers.TimestampProvider
 import org.joda.time.DateTime
 import play.api.libs.json.{Json, OFormat}
 
@@ -20,7 +21,7 @@ case class PlayServerInformation(
 object PlayServerInformation {
   implicit val playServerInformationFormat: OFormat[PlayServerInformation] = Json.format[PlayServerInformation]
 
-  def apply(): PlayServerInformation =
+  def apply(implicit timestampProvider: TimestampProvider): PlayServerInformation =
     PlayServerInformation(
       BuildInfo.name,
       BuildInfo.organization,
@@ -28,6 +29,6 @@ object PlayServerInformation {
       Properties.javaVersion,
       BuildInfo.sbtVersion,
       BuildInfo.scalaVersion,
-      DateTime.now()
+      timestampProvider.dateTime()
     )
 }

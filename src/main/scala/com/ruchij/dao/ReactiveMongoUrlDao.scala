@@ -53,6 +53,11 @@ class ReactiveMongoUrlDao @Inject()(mongoDatabase: MongoDatabase) extends UrlDao
         .cursor[Url]()
         .collect(pageSize, Cursor.FailOnError[List[Url]]())
     }
+  override def delete(key: String)(implicit executionContext: ExecutionContext): FutureOpt[Url] =
+    fetch(key)
+      .flatMapM {
+        url => urls.flatMap[FindAndModifyResult](_.findAndRemove(Json.toJsObject(url))).map(_ => url)
+      }
 }
 
 object ReactiveMongoUrlDao {

@@ -2,6 +2,7 @@ package com.ruchij.health.models
 
 import com.ruchij.eed3si9n.BuildInfo
 import com.ruchij.json.JsonFormats.dateTimeFormat
+import com.ruchij.providers.TimestampProvider
 import org.joda.time.DateTime
 import play.api.libs.json.{Json, OFormat}
 
@@ -20,7 +21,7 @@ case class ServiceInformation(
 object ServiceInformation {
   implicit val serviceInformationFormat: OFormat[ServiceInformation] = Json.format[ServiceInformation]
 
-  def apply(): ServiceInformation =
+  def apply(implicit timestampProvider: TimestampProvider): ServiceInformation =
     ServiceInformation(
       BuildInfo.name,
       BuildInfo.organization,
@@ -28,6 +29,6 @@ object ServiceInformation {
       Properties.javaVersion,
       BuildInfo.scalaVersion,
       BuildInfo.sbtVersion,
-      DateTime.now()
+      timestampProvider.dateTime()
     )
 }

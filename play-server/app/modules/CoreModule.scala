@@ -4,6 +4,7 @@ import com.google.inject.{AbstractModule, Provides}
 import com.ruchij.config.service.ServiceConfiguration
 import com.ruchij.configuration.ConfigLoader
 import com.ruchij.ec.BlockingExecutionContext
+import com.ruchij.providers.Providers
 import com.ruchij.services.hashing.{HashingService, MurmurHashingService}
 import ec.BlockingExecutionContextImpl
 import javax.inject.Singleton
@@ -22,6 +23,7 @@ class CoreModule extends AbstractModule {
 
     bind(classOf[BlockingExecutionContext]).to(classOf[BlockingExecutionContextImpl])
     bind(classOf[HashingService]).to(classOf[MurmurHashingService])
+    bind(classOf[Providers]).toInstance(Providers)
   }
 
   @Provides

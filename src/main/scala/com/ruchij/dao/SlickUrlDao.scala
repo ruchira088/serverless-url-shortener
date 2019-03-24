@@ -1,9 +1,10 @@
 package com.ruchij.dao
 
 import java.sql.Timestamp
+import java.util.UUID
 
 import com.ruchij.FutureOpt
-import com.ruchij.exceptions.{DatabaseException, EmptyOptionException}
+import com.ruchij.exceptions.{DatabaseException, EmptyOptionException, IncorrectDeleteSecretException}
 import com.ruchij.monad.Monad.futureMonad
 import com.ruchij.services.url.models.Url
 import org.joda.time.DateTime
@@ -35,8 +36,10 @@ class SlickUrlDao(val jdbcProfile: JdbcProfile, db: BasicBackend#DatabaseDef) ex
 
     def hits: Rep[Double] = column[Double]("hits")
 
+    def deleteSecret: Rep[UUID] = column[UUID]("delete_secret")
+
     override def * : ProvenShape[Url] =
-      (key, createdAt, longUrl, hits) <> (Url.apply _ tupled, Url.unapply)
+      (key, createdAt, longUrl, hits, deleteSecret) <> (Url.apply _ tupled, Url.unapply)
   }
 
   val urls = TableQuery[Urls]
@@ -44,28 +47,35 @@ class SlickUrlDao(val jdbcProfile: JdbcProfile, db: BasicBackend#DatabaseDef) ex
   override def insert(url: Url)(implicit executionContext: ExecutionContext): Future[Url] =
     for {
       _ <- db.run(urls += url)
-      insertedUrl <-
-        fetch(url.key).flatten
-          .recoverWith {
-            case EmptyOptionException => Future.failed(DatabaseException("Unable to fetch persisted item"))
-          }
-    }
-    yield insertedUrl
+      insertedUrl <- fetch(url.key).flatten
+        .recoverWith {
+          case EmptyOptionException => Future.failed(DatabaseException("Unable to fetch persisted item"))
+        }
+    } yield insertedUrl
 
   override def fetch(key: String)(implicit executionContext: ExecutionContext): FutureOpt[Url] =
     FutureOpt {
-      db.run(urls.filter(_.key === key).result).map(_.headOption)
+      db.run { urls.filter(_.key === key).result }.map(_.headOption)
     }
 
   override def incrementHit(key: String)(implicit executionContext: ExecutionContext): FutureOpt[Url] =
     fetch(key)
-      .flatMapM {
-        url => db.run(urls.filter(_.key === key).map(_.hits).update(url.hits + 1))
+      .flatMapM { url =>
+        db.run {
+          urls.filter(_.key === key).map(_.hits).update(url.hits + 1)
+        }
       }
-      .flatMap { _ => fetch(key) }
+      .flatMap { _ =>
+        fetch(key)
+      }
 
   override def fetchAll(page: Int, pageSize: Int)(implicit executionContext: ExecutionContext): Future[List[Url]] =
-    db.run(urls.drop(page * pageSize).take(pageSize).sortBy(_.createdAt).result).map(_.toList)
+    db.run { urls.drop(page * pageSize).take(pageSize).sortBy(_.createdAt).result }.map(_.toList)
+
+  override def delete(key: String)(implicit executionContext: ExecutionContext): FutureOpt[Url] =
+    fetch(key).flatMapM {
+      url => db.run { urls.filter(_.key === key).delete }.map(_ => url)
+    }
 }
 
 object SlickUrlDao {

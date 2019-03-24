@@ -5,6 +5,7 @@ import com.ruchij.config.elasticsearch.ElasticSearchConfiguration
 import com.ruchij.config.elasticsearch.ElasticSearchConfiguration.indexAndType
 import com.ruchij.exceptions.ElasticException
 import com.ruchij.services.url.models.Url
+import com.sksamuel.elastic4s.Index
 import com.sksamuel.elastic4s.http.ElasticClient
 import com.sksamuel.elastic4s.http.ElasticDsl._
 import com.sksamuel.elastic4s.playjson._
@@ -72,4 +73,18 @@ class ElasticSearchUrlDao @Inject()(
         Future.sequence(response.result.safeTo[Url].map(Future.fromTry))
       }
       .map(_.toList)
+
+  override def delete(key: String)(implicit executionContext: ExecutionContext): FutureOpt[Url] =
+    FutureOpt {
+      elasticClient
+        .execute {
+          deleteById(Index(elasticSearchConfiguration.index), elasticSearchConfiguration.`type`, key)
+        }
+        .flatMap { response =>
+          response.fold[Future[Option[Url]]](Future.failed(ElasticException(response.error))) { _ =>
+            fetch(key).value
+          }
+        }
+    }
+
 }
