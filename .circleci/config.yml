@@ -65,8 +65,9 @@ jobs:
       - run:
           name: Install Serverless
           command: npm install -g serverless
+      - checkout
       - attach_workspace:
-          at: resources
+          at: target
       - run:
           name: Check
           command: |
