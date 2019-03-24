@@ -95,7 +95,7 @@ jobs:
       - run:
           name: Deploy
           command: serverless deploy -v
-      - persist_workspace:
+      - persist_to_workspace:
           root: .
           paths:
             - config/config.yml
