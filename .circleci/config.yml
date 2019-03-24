@@ -73,7 +73,7 @@ jobs:
           name: Apply terraform
           command: |
             cd terraform && \
-            terraform plan -var="branch_name=${CIRCLE_BRANCH}" && terraform output -json > output/output.json && \
+            terraform apply -var="branch_name=${CIRCLE_BRANCH}" -auto-approve && terraform output -json > output/output.json && \
             cd ..
       - persist_to_workspace:
           root: .
