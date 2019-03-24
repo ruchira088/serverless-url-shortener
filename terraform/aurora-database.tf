@@ -1,6 +1,7 @@
 
 resource "random_string" "database_username" {
   length = 16
+  number = false
   special = false
 }
 
