@@ -57,8 +57,6 @@ jobs:
             unzip terraform.zip && rm terraform.zip && chmod +x terraform && \
             mv -f $PWD/terraform /usr/local/bin/
       - checkout
-      - attach_workspace:
-          at: .
       - run:
           name: Create the terraform backend file
           command: envsubst < terraform/backend.template > terraform/backend.tf
