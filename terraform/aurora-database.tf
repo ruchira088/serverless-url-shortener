@@ -62,6 +62,10 @@ output "database_name" {
   value = "${aws_rds_cluster.database_cluster.database_name}"
 }
 
+output "database_port" {
+  value = "${aws_rds_cluster.database_cluster.port}"
+}
+
 output "database_endpoint" {
   value = "${aws_rds_cluster.database_cluster.endpoint}"
 }

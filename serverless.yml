@@ -1,21 +1,23 @@
 
 service: serverless-url-shortener
 
+custom: ${file(./config/config.yml)}
+
 provider:
   name: aws
   region: ap-southeast-2
   runtime: java8
   vpc:
     securityGroupIds:
-      - ${env:SERVERLESS_SECURITY_GROUP}
+      - ${self:custom.securityGroup}
     subnetIds:
-      - ${env:LAMBDA_SUBNET_1}
-      - ${env:LAMBDA_SUBNET_2}
-      - ${env:LAMBDA_SUBNET_3}
+      - ${self:custom.subnetOne}
+      - ${self:custom.subnetTwo}
+      - ${self:custom.subnetThree}
   environment:
-    MYSQL_URL: ${env:MYSQL_URL}
-    MYSQL_USER: ${env:MYSQL_USER}
-    MYSQL_PASSWORD: ${env:MYSQL_PASSWORD}
+    MYSQL_URL: ${self:custom.mysqlUrl}
+    MYSQL_USER: ${self:custom.mysqlUser}
+    MYSQL_PASSWORD: ${self:custom.mysqlPassword}
 
 package:
   artifact: target/scala-2.12/serverless-url-shortener.jar

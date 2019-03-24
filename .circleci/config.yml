@@ -68,12 +68,12 @@ jobs:
           command: |
             cd terraform && \
             terraform apply -var="branch_name=${CIRCLE_BRANCH}" -auto-approve && \
-            mkdir output && terraform output -json > output/output.json && \
+            mkdir output && terraform output -json > ../config/output.json && \
             cd ..
       - persist_to_workspace:
           root: .
           paths:
-            - terraform/output/output.json
+            - config/output.json
 
   deploy_serverless:
     docker:
@@ -90,11 +90,15 @@ jobs:
       - attach_workspace:
           at: .
       - run:
-          name: Examine workspace
-          command: tree
+          name: Create Serverless environment configuration values
+          command: ./config/serverless-values.sh
       - run:
-          name: Check
-          command: cat terraform/output/output.json
+          name: Deploy
+          command: serverless deploy -v
+      - persist_workspace:
+          root: .
+          paths:
+            - config/config.yml
 
   backup_artifacts:
     docker:
@@ -106,6 +110,13 @@ jobs:
             apt update && apt install python-pip python-dev build-essential -y && \
             pip install awscli --upgrade --user && \
             ln -sf $HOME/.local/bin/aws /usr/local/bin
+      - attach_workspace:
+          at: .
+      - run:
+          name: Upload artifacts
+          command: |
+            cat config/config.yml
+            cat config/output.json
 
 workflows:
   version: 2
