@@ -38,7 +38,6 @@ jobs:
           root: .
           paths:
             - target/scala-2.12/serverless-url-shortener.jar
-            - terraform/output
       - save_cache:
           paths:
             - ~/.ivy2
