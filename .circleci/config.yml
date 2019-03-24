@@ -52,7 +52,7 @@ jobs:
       - run:
           name: Install terraform
           command: |
-            apt update && apt install curl unzip jq tree gettext -y
+            apt update && apt install curl unzip gettext -y
 
             curl -o terraform.zip https://releases.hashicorp.com/terraform/0.11.13/terraform_0.11.13_linux_amd64.zip && \
             unzip terraform.zip && rm terraform.zip && chmod +x terraform && \
@@ -60,9 +60,6 @@ jobs:
       - checkout
       - attach_workspace:
           at: .
-      - run:
-          name: Observe file structure
-          command: tree
       - run:
           name: Create the terraform backend file
           command: envsubst < terraform/backend.template > terraform/backend.tf
@@ -73,7 +70,8 @@ jobs:
           name: Apply terraform
           command: |
             cd terraform && \
-            terraform apply -var="branch_name=${CIRCLE_BRANCH}" -auto-approve && terraform output -json > output/output.json && \
+            terraform apply -var="branch_name=${CIRCLE_BRANCH}" -auto-approve && \
+            mkdir output && terraform output -json > output/output.json && \
             cd ..
       - persist_to_workspace:
           root: .
@@ -87,12 +85,17 @@ jobs:
       - run:
           name: Install Serverless
           command: npm install -g serverless
+      - run:
+          name: Install jq
+          command: |
+            apt update && apt install jq tree -y
+      - checkout
       - attach_workspace:
           at: .
       - run:
           name: Check
           command: |
-            apt update && apt install tree -y && tree
+            tree
 
 workflows:
   version: 2
