@@ -35,9 +35,9 @@ jobs:
           name: Build root project fat jar
           command: sbt assembly
       - persist_to_workspace:
-          root: target/scala-2.12/
+          root: .
           paths:
-            - serverless-url-shortener.jar
+            - target/scala-2.12/serverless-url-shortener.jar
       - save_cache:
           paths:
             - ~/.ivy2
@@ -71,9 +71,9 @@ jobs:
             mkdir output && terraform output -json > output/output.json && \
             cd ..
       - persist_to_workspace:
-          root: terraform
+          root: .
           paths:
-            - output/output.json
+            - terraform/output/output.json
 
   deploy_serverless:
     docker:
@@ -96,6 +96,17 @@ jobs:
           name: Check
           command: cat terraform/output/output.json
 
+  backup_artifacts:
+    docker:
+      - image: ubuntu
+    steps:
+      - run:
+          name: Install AWS CLI
+          command: |
+            apt update && apt install python-pip python-dev build-essential -y && \
+            pip install awscli --upgrade --user && \
+            ln -sf $HOME/.local/bin/aws /usr/local/bin
+
 workflows:
   version: 2
   deploy:
@@ -107,5 +118,8 @@ workflows:
       - deploy_serverless:
           requires:
             - create_aws_resources
+      - backup_artifacts:
+          requires:
+            - deploy_serverless
 
 
