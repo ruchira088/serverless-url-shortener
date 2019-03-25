@@ -1,6 +1,6 @@
 package web.controllers
 
-import com.ruchij.lambda.handlers.{UrlFetchAllHandler, UrlInfoHandler, UrlInsertionHandler, UrlRedirectHandler}
+import com.ruchij.lambda.handlers._
 import com.ruchij.services.url.UrlShorteningService
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.JsValue
@@ -14,6 +14,11 @@ import scala.concurrent.ExecutionContext
 class UrlController @Inject()(urlShorteningService: UrlShorteningService, controllerComponents: ControllerComponents)(
   implicit executionContext: ExecutionContext
 ) extends AbstractController(controllerComponents) {
+
+  def initialize(): Action[AnyContent] =
+    Action.async { request =>
+      DatabaseInitializationHandler.initialize(request, urlShorteningService)
+    }
 
   def insert(): Action[JsValue] =
     Action.async(parse.json) { request =>

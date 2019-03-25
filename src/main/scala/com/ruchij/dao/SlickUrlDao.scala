@@ -3,12 +3,13 @@ package com.ruchij.dao
 import java.sql.Timestamp
 
 import com.ruchij.FutureOpt
-import com.ruchij.exceptions.{DatabaseException, EmptyOptionException}
+import com.ruchij.exceptions.{DatabaseException, DatabaseTableInitializationException, EmptyOptionException}
 import com.ruchij.monad.Monad.futureMonad
 import com.ruchij.services.url.models.Url
 import org.joda.time.DateTime
 import slick.ast.BaseTypedType
 import slick.basic.{BasicBackend, DatabaseConfig}
+import slick.jdbc.meta.MTable
 import slick.jdbc.{JdbcProfile, JdbcType}
 import slick.lifted.ProvenShape
 
@@ -44,13 +45,11 @@ class SlickUrlDao(val jdbcProfile: JdbcProfile, db: BasicBackend#DatabaseDef) ex
   override def insert(url: Url)(implicit executionContext: ExecutionContext): Future[Url] =
     for {
       _ <- db.run(urls += url)
-      insertedUrl <-
-        fetch(url.key).flatten
-          .recoverWith {
-            case EmptyOptionException => Future.failed(DatabaseException("Unable to fetch persisted item"))
-          }
-    }
-    yield insertedUrl
+      insertedUrl <- fetch(url.key).flatten
+        .recoverWith {
+          case EmptyOptionException => Future.failed(DatabaseException("Unable to fetch persisted item"))
+        }
+    } yield insertedUrl
 
   override def fetch(key: String)(implicit executionContext: ExecutionContext): FutureOpt[Url] =
     FutureOpt {
@@ -59,13 +58,30 @@ class SlickUrlDao(val jdbcProfile: JdbcProfile, db: BasicBackend#DatabaseDef) ex
 
   override def incrementHit(key: String)(implicit executionContext: ExecutionContext): FutureOpt[Url] =
     fetch(key)
-      .flatMapM {
-        url => db.run(urls.filter(_.key === key).map(_.hits).update(url.hits + 1))
+      .flatMapM { url =>
+        db.run(urls.filter(_.key === key).map(_.hits).update(url.hits + 1))
       }
-      .flatMap { _ => fetch(key) }
+      .flatMap { _ =>
+        fetch(key)
+      }
 
   override def fetchAll(page: Int, pageSize: Int)(implicit executionContext: ExecutionContext): Future[List[Url]] =
     db.run(urls.drop(page * pageSize).take(pageSize).sortBy(_.createdAt).result).map(_.toList)
+
+  def initialize()(implicit executionContext: ExecutionContext): Future[Either[MTable, MTable]] =
+    initialize(initial = true)
+
+  private def initialize(initial: Boolean)(implicit executionContext: ExecutionContext): Future[Either[MTable, MTable]] =
+    db.run(MTable.getTables(SlickUrlDao.TABLE_NAME))
+      .flatMap {
+        _.find(_.name.name == SlickUrlDao.TABLE_NAME)
+          .fold {
+            if (initial)
+              db.run(urls.schema.create).flatMap(_ => initialize(initial = false))
+            else
+              Future.failed(DatabaseTableInitializationException(SlickUrlDao.TABLE_NAME))
+          } (table => if (initial) Future.successful(Left(table)) else Future.successful(Right(table)))
+      }
 }
 
 object SlickUrlDao {
