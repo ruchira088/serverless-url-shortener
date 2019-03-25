@@ -73,8 +73,9 @@ class SlickUrlDao(val jdbcProfile: JdbcProfile, db: BasicBackend#DatabaseDef) ex
 
   private def initialize(initial: Boolean)(implicit executionContext: ExecutionContext): Future[Either[MTable, MTable]] =
     db.run(MTable.getTables(SlickUrlDao.TABLE_NAME))
-      .flatMap {
-        _.find(_.name.name == SlickUrlDao.TABLE_NAME)
+      .flatMap { tables =>
+        println(tables.map(_.name.name))
+        tables.find(_.name.name == SlickUrlDao.TABLE_NAME)
           .fold {
             if (initial)
               db.run(urls.schema.create).flatMap(_ => initialize(initial = false))

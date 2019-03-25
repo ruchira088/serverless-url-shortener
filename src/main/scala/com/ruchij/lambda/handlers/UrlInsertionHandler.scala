@@ -1,6 +1,6 @@
 package com.ruchij.lambda.handlers
 
-import java.net.HttpURLConnection.{HTTP_ACCEPTED, HTTP_CREATED}
+import java.net.HttpURLConnection.{HTTP_OK, HTTP_CREATED}
 
 import com.amazonaws.services.lambda.runtime.{Context, RequestHandler}
 import com.ruchij.config.service.ServiceConfiguration
@@ -39,7 +39,7 @@ object UrlInsertionHandler {
         }
       } yield
         Response(
-          if (url.isRight) HTTP_CREATED else HTTP_ACCEPTED,
+          if (url.isRight) HTTP_CREATED else HTTP_OK,
           Json.toJsObject(url.fold(identity, identity)),
           Map.empty[String, AnyRef]
         )
