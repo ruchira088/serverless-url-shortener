@@ -1,6 +1,8 @@
 package com.ruchij.lambda.handlers
 import com.ruchij.exceptions.ValidationException
 
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 import scala.util.matching.Regex
 import scala.util.{Failure, Success, Try}
 
@@ -27,4 +29,6 @@ object HandlerUtils {
     case path =>
       Failure(ValidationException(s"""Unable to extract "${pathPrefix.path}" from $path"""))
   }
+
+  def await[A](future: Future[A]): A = Await.result(future, Duration.Inf)
 }

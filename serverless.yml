@@ -58,3 +58,10 @@ functions:
             parameters:
               paths:
                 key: true
+
+  initializeDatabase:
+    handler: com.ruchij.lambda.handlers.DatabaseInitializationHandler
+    events:
+      - http:
+          path: init
+          method: post
