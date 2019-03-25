@@ -7,6 +7,7 @@ provider:
   name: aws
   region: ap-southeast-2
   runtime: java8
+  timeout: 20
   vpc:
     securityGroupIds:
       - ${self:custom.securityGroup}
