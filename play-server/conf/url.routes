@@ -1,4 +1,6 @@
 
+POST    /init       web.controllers.UrlController.initialize()
+
 POST    /url        web.controllers.UrlController.insert()
 
 GET     /url/:key   web.controllers.UrlController.info(key)

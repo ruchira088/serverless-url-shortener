@@ -19,6 +19,8 @@ project/plugins/project/
 # Serverless directories
 .serverless
 
+
 /terraform/.terraform
+*.tfstate
 
 /play-server/.sqlite

@@ -1,0 +1,132 @@
+version: 2
+
+jobs:
+  build_and_test:
+    docker:
+      - image: openjdk:8-jdk
+    steps:
+      - run:
+          name: Install sbt
+          command: |
+            wget https://piccolo.link/sbt-1.2.8.tgz -P ~/downloads && \
+            tar -xvf ~/downloads/sbt-1.2.8.tgz -C ~ && \
+            ln -s ~/sbt/bin/sbt /usr/local/bin
+      - checkout
+      - restore_cache:
+          keys:
+            - sbt-cache-{{ checksum "project/Dependencies.scala" }}-{{ checksum "project/plugins.sbt" }}-{{ checksum "project/build.properties" }}
+      - run:
+          name: Compile root project
+          command: sbt compile
+      - run:
+          name: Execute root project unit test suite
+          command: sbt test
+      - run:
+          name: Compile playServer project
+          command: sbt "playServer/compile"
+      - run:
+          name: Execute playServer project unit test suite
+          command: sbt "playServer/test"
+      - run:
+          name: Build root project fat jar
+          command: sbt assembly
+      - persist_to_workspace:
+          root: .
+          paths:
+            - target/scala-2.12/serverless-url-shortener.jar
+      - save_cache:
+          paths:
+            - ~/.ivy2
+            - ~/.sbt
+          key: sbt-cache-{{ checksum "project/Dependencies.scala" }}-{{ checksum "project/plugins.sbt" }}-{{ checksum "project/build.properties" }}
+
+  create_aws_resources:
+    docker:
+      - image: ubuntu
+    steps:
+      - run:
+          name: Install terraform
+          command: |
+            apt update && apt install curl unzip gettext -y
+
+            curl -o terraform.zip https://releases.hashicorp.com/terraform/0.11.13/terraform_0.11.13_linux_amd64.zip && \
+            unzip terraform.zip && rm terraform.zip && chmod +x terraform && \
+            mv -f $PWD/terraform /usr/local/bin/
+      - checkout
+      - run:
+          name: Create the terraform backend file
+          command: envsubst < terraform/backend.template > terraform/backend.tf
+      - run:
+          name: Initialize terraform
+          command: cd terraform && terraform init && cd ..
+      - run:
+          name: Apply terraform
+          command: |
+            cd terraform && \
+            terraform apply -var="branch_name=${CIRCLE_BRANCH}" -auto-approve && \
+            mkdir output && terraform output -json > ../config/output.json && \
+            cd ..
+      - persist_to_workspace:
+          root: .
+          paths:
+            - config/output.json
+
+  deploy_serverless:
+    docker:
+      - image: node
+    steps:
+      - run:
+          name: Install Serverless
+          command: npm install -g serverless
+      - run:
+          name: Install jq
+          command: |
+            apt update && apt install jq -y
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Create Serverless environment configuration values
+          command: ./config/serverless-values.sh
+      - run:
+          name: Deploy
+          command: serverless deploy -v
+      - persist_to_workspace:
+          root: .
+          paths:
+            - config/config.yml
+
+  backup_artifacts:
+    docker:
+      - image: ubuntu
+    steps:
+      - run:
+          name: Install AWS CLI
+          command: |
+            apt update && apt install python-pip python-dev build-essential -y && \
+            pip install awscli --upgrade --user && \
+            ln -sf $HOME/.local/bin/aws /usr/local/bin
+      - attach_workspace:
+          at: .
+      - run:
+          name: Upload artifacts
+          command: |
+            cat config/config.yml
+            cat config/output.json
+
+workflows:
+  version: 2
+  deploy:
+    jobs:
+      - build_and_test
+      - create_aws_resources:
+          requires:
+            - build_and_test
+      - deploy_serverless:
+          requires:
+            - create_aws_resources
+      - backup_artifacts:
+          requires:
+            - deploy_serverless
+
+

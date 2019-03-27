@@ -4,13 +4,15 @@ import java.sql.Timestamp
 import java.util.UUID
 
 import com.ruchij.FutureOpt
-import com.ruchij.exceptions.{DatabaseException, EmptyOptionException, IncorrectDeleteSecretException}
+import com.ruchij.dao.models.InitializationResult
+import com.ruchij.dao.models.InitializationResult.SlickDaoInitializationResult
+import com.ruchij.exceptions.{DatabaseException, EmptyOptionException}
 import com.ruchij.monad.Monad.futureMonad
 import com.ruchij.services.url.models.Url
 import org.joda.time.DateTime
 import slick.ast.BaseTypedType
 import slick.basic.{BasicBackend, DatabaseConfig}
-import slick.jdbc.{JdbcProfile, JdbcType}
+import slick.jdbc.{JdbcProfile, JdbcType, SQLiteProfile}
 import slick.lifted.ProvenShape
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -73,8 +75,28 @@ class SlickUrlDao(val jdbcProfile: JdbcProfile, db: BasicBackend#DatabaseDef) ex
     db.run { urls.drop(page * pageSize).take(pageSize).sortBy(_.createdAt).result }.map(_.toList)
 
   override def delete(key: String)(implicit executionContext: ExecutionContext): FutureOpt[Url] =
-    fetch(key).flatMapM {
-      url => db.run { urls.filter(_.key === key).delete }.map(_ => url)
+    fetch(key).flatMapM { url =>
+      db.run { urls.filter(_.key === key).delete }.map(_ => url)
+    }
+
+  //
+  // db.run(MTable.getTables(SlickUrlDao.TABLE_NAME)) is NOT supported by Aurora MYSQL Serverless
+  //
+  override def initialize()(implicit executionContext: ExecutionContext): FutureOpt[InitializationResult] =
+    FutureOpt[InitializationResult, Future, Option] {
+      jdbcProfile match {
+        case SQLiteProfile => Future.successful(None)
+        case _ =>
+          db.run(
+              sql"SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = ${SlickUrlDao.TABLE_NAME}".as[Int]
+            )
+            .flatMap {
+              case Vector(0) =>
+                db.run(urls.schema.create).map(_ => Some(SlickDaoInitializationResult(SlickUrlDao.TABLE_NAME)))
+
+              case _ => Future.successful(None)
+            }
+      }
     }
 }
 

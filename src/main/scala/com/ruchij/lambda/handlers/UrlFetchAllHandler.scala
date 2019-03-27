@@ -6,10 +6,10 @@ import com.amazonaws.services.lambda.runtime.{Context, RequestHandler}
 import com.ruchij.config.service.ServiceConfiguration
 import com.ruchij.dao.SlickUrlDao
 import com.ruchij.ec.ServerlessBlockExecutionContext.blockingExecutionContext
-import com.ruchij.lambda.handlers.UrlFetchAllHandler.fetchAll
+import com.ruchij.lambda.handlers.HandlerUtils.await
 import com.ruchij.lambda.models.{Request, Response}
 import com.ruchij.lambda.requests.QueryParameter
-import com.ruchij.lambda.responses.{FetchAllUrlsResponse, ResponseHandler}
+import com.ruchij.lambda.responses.FetchAllUrlsResponse
 import com.ruchij.lambda.responses.ResponseHandler.handleExceptions
 import com.ruchij.providers.Providers
 import com.ruchij.services.hashing.MurmurHashingService
@@ -17,18 +17,16 @@ import com.ruchij.services.url.UrlShorteningService
 import play.api.libs.json.Json
 
 import scala.concurrent.Future.fromTry
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 
 class UrlFetchAllHandler extends RequestHandler[Request, Response] {
   override def handleRequest(request: Request, context: Context): Response =
-    Await.result(
-      fetchAll(
+    await {
+      UrlFetchAllHandler.fetchAll(
         request,
         new UrlShorteningService(SlickUrlDao(), new MurmurHashingService)(ServiceConfiguration.default, Providers)
-      ),
-      Duration.Inf
-    )
+      )
+    }
 }
 
 object UrlFetchAllHandler {

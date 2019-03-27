@@ -10,7 +10,8 @@ lazy val macroUtilities =
         organization := "com.ruchij",
         version := "0.0.1",
         scalaVersion := SCALA_VERSION,
-        libraryDependencies ++= Seq(typesafeConfig, scalaReflect)
+        libraryDependencies ++= Seq(typesafeConfig, scalaReflect),
+        scalacOptions ++= Seq("-feature")
       )
 
 lazy val root =
@@ -29,6 +30,7 @@ lazy val root =
         },
         buildInfoKeys := BuildInfoKey.ofN(name, organization, version, scalaVersion, sbtVersion),
         buildInfoPackage := "com.ruchij.eed3si9n",
+        scalacOptions ++= Seq("-feature"),
         libraryDependencies ++=
           Seq(
             awsLambdaJavaCore,
@@ -61,6 +63,7 @@ lazy val playServer =
         scalaVersion := SCALA_VERSION,
         buildInfoKeys := BuildInfoKey.ofN(name, organization, version, scalaVersion, sbtVersion),
         buildInfoPackage := "com.ruchij.eed3si9n.play",
+        scalacOptions ++= Seq("-feature"),
         libraryDependencies ++=
           Seq(guice, ws, playSlick, playSlickEvolutions, playReactiveMongo)
       )
@@ -71,6 +74,10 @@ lazy val serverlessDeploy = taskKey[Unit]("Deploy Serverless service")
 serverlessDeploy := {
     "serverless deploy -v" !
   }
+
+addCommandAlias("compileAll", ";macroUtilities/compile ;compile ;playServer/compile")
+
+addCommandAlias("cleanAll", ";playServer/clean ;clean ;macroUtilities/clean")
 
 addCommandAlias("deploy", ";assembly ;serverlessDeploy")
 
