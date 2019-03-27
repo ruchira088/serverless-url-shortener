@@ -28,7 +28,9 @@ class Request(
       }
 
   def setPathParameters(parameters: java.util.Map[String, String]): Unit =
-    pathParameters = parameters.asScala.toMap
+    Option(parameters).foreach { values =>
+      pathParameters = values.asScala.toMap
+    }
 
   def withPathParameter(parameter: (PathParameter[_], String) ): Request = {
     val (pathParameter, value) = parameter
