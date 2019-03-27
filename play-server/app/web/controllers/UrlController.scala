@@ -1,6 +1,7 @@
 package web.controllers
 
 import com.ruchij.lambda.handlers._
+import com.ruchij.lambda.models.PathParameter.UrlKey
 import com.ruchij.services.url.UrlShorteningService
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.JsValue
@@ -27,12 +28,12 @@ class UrlController @Inject()(urlShorteningService: UrlShorteningService, contro
 
   def info(key: String): Action[AnyContent] =
     Action.async { request =>
-      UrlInfoHandler.info(request, urlShorteningService)
+      UrlInfoHandler.info(request.withPathParameter(UrlKey -> key), urlShorteningService)
     }
 
   def redirect(key: String): Action[AnyContent] =
     Action.async { request =>
-      UrlRedirectHandler.redirect(request, urlShorteningService)
+      UrlRedirectHandler.redirect(request.withPathParameter(UrlKey -> key), urlShorteningService)
     }
 
   def fetchAll(): Action[AnyContent] =

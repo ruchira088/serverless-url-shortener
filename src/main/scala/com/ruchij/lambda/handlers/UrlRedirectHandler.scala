@@ -8,6 +8,7 @@ import com.ruchij.config.service.ServiceConfiguration
 import com.ruchij.dao.SlickUrlDao
 import com.ruchij.ec.ServerlessBlockExecutionContext.blockingExecutionContext
 import com.ruchij.lambda.handlers.HandlerUtils._
+import com.ruchij.lambda.models.PathParameter.{pathParameter, UrlKey}
 import com.ruchij.lambda.models.{Request, Response}
 import com.ruchij.lambda.responses.ResponseHandler.handleExceptions
 import com.ruchij.services.hashing.MurmurHashingService
@@ -33,7 +34,7 @@ object UrlRedirectHandler {
   ): Future[Response] =
     handleExceptions {
       for {
-        key <- fromTry { extractKey(RedirectPrefix)(request.path) }
+        key <- fromTry { pathParameter(UrlKey, request) }
         url <- urlShorteningService.fetch(key)
       } yield Response(HTTP_MOVED_TEMP, Json.obj(), Map(HttpHeaders.LOCATION -> url.longUrl))
     }

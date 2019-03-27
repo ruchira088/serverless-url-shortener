@@ -7,6 +7,7 @@ import com.ruchij.config.service.ServiceConfiguration
 import com.ruchij.dao.SlickUrlDao
 import com.ruchij.ec.ServerlessBlockExecutionContext.blockingExecutionContext
 import com.ruchij.lambda.handlers.HandlerUtils._
+import com.ruchij.lambda.models.PathParameter.{UrlKey, pathParameter}
 import com.ruchij.lambda.models.{Request, Response}
 import com.ruchij.lambda.responses.ResponseHandler.handleExceptions
 import com.ruchij.services.hashing.MurmurHashingService
@@ -32,7 +33,7 @@ object UrlInfoHandler {
   ): Future[Response] =
     handleExceptions {
       for {
-        key <- fromTry { extractKey(InfoPrefix)(request.path) }
+        key <- fromTry { pathParameter(UrlKey, request) }
         url <- urlShorteningService.info(key)
       } yield Response(HTTP_OK, Json.toJsObject(url), Map.empty[String, AnyRef])
     }

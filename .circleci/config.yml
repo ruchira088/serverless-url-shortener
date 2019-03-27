@@ -81,7 +81,7 @@ jobs:
       - run:
           name: Install jq
           command: |
-            apt update && apt install tree jq -y
+            apt update && apt install jq -y
       - checkout
       - attach_workspace:
           at: .
