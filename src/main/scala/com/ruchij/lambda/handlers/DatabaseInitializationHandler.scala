@@ -6,14 +6,14 @@ import com.amazonaws.services.lambda.runtime.{Context, RequestHandler}
 import com.ruchij.config.service.ServiceConfiguration
 import com.ruchij.dao.SlickUrlDao
 import com.ruchij.ec.ServerlessBlockExecutionContext.blockingExecutionContext
+import com.ruchij.general.Messages
 import com.ruchij.lambda.handlers.HandlerUtils.await
 import com.ruchij.lambda.models.{Request, Response}
+import com.ruchij.lambda.responses.InitializationResponse
 import com.ruchij.lambda.responses.ResponseHandler.handleExceptions
-import com.ruchij.lambda.responses.Table
 import com.ruchij.services.hashing.MurmurHashingService
 import com.ruchij.services.url.UrlShorteningService
 import play.api.libs.json.Json
-import slick.jdbc.meta.MTable
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -32,12 +32,18 @@ object DatabaseInitializationHandler {
     implicit executionContext: ExecutionContext
   ): Future[Response] =
     handleExceptions {
-      urlShorteningService.initialize().map[Response] { table =>
-        Response(
-          table.fold(_ => HTTP_OK, _ => HTTP_CREATED),
-          Json.toJsObject(Table.fromMTable(table.fold[MTable](identity, identity))),
-          Map.empty[String, AnyRef]
-        )
-      }
+      urlShorteningService.initialize().value
+        .map {
+          case None => InitializationResponse(Messages.DATABASE_ALREADY_INITIALIZED, None)
+          case initializationResult =>
+            InitializationResponse(Messages.DATABASE_INITIALIZATION_SUCCESS, initializationResult)
+        }
+        .map { initializationResponse =>
+          Response(
+            initializationResponse.message.fold(HTTP_OK)(_ => HTTP_CREATED),
+            Json.toJsObject(initializationResponse),
+            Map.empty[String, AnyRef]
+          )
+        }
     }
 }

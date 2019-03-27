@@ -1,14 +1,14 @@
 package com.ruchij.services.url
+import com.ruchij.FutureOpt
 import com.ruchij.config.service.ServiceConfiguration
-import com.ruchij.dao.{SlickUrlDao, UrlDao}
+import com.ruchij.dao.UrlDao
+import com.ruchij.dao.models.InitializationResult
 import com.ruchij.exceptions.{ExistingUrlKeyException, MissingUrlKeyException}
-import com.ruchij.general.Constants
 import com.ruchij.services.hashing.HashingService
 import com.ruchij.services.url.UrlShorteningService.mapper
 import com.ruchij.services.url.models.Url
 import javax.inject.{Inject, Singleton}
 import org.joda.time.DateTime
-import slick.jdbc.meta.MTable
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -40,13 +40,8 @@ class UrlShorteningService @Inject()(
   def fetchAll(page: Int, pageSize: Int)(implicit executionContext: ExecutionContext): Future[List[Url]] =
     urlDao.fetchAll(page, pageSize)
 
-  def initialize()(implicit executionContext: ExecutionContext): Future[Either[MTable, MTable]] =
-    urlDao match {
-      case slickUrlDao: SlickUrlDao => slickUrlDao.initialize()
-      case _ => Future.failed {
-        new UnsupportedOperationException("Service initialization is ONLY applicable when utilizing Slick DAOs")
-      }
-    }
+  def initialize()(implicit executionContext: ExecutionContext): FutureOpt[InitializationResult] =
+    urlDao.initialize()
 
   private def insert(longUrl: String, suffix: String, keySize: Int, remaining: Int)(
     implicit executionContext: ExecutionContext

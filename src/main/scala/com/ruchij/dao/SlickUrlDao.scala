@@ -3,14 +3,15 @@ package com.ruchij.dao
 import java.sql.Timestamp
 
 import com.ruchij.FutureOpt
-import com.ruchij.exceptions.{DatabaseException, DatabaseTableInitializationException, EmptyOptionException}
+import com.ruchij.dao.models.InitializationResult
+import com.ruchij.dao.models.InitializationResult.SlickDaoInitializationResult
+import com.ruchij.exceptions.{DatabaseException, EmptyOptionException}
 import com.ruchij.monad.Monad.futureMonad
 import com.ruchij.services.url.models.Url
 import org.joda.time.DateTime
 import slick.ast.BaseTypedType
 import slick.basic.{BasicBackend, DatabaseConfig}
-import slick.jdbc.meta.MTable
-import slick.jdbc.{JdbcProfile, JdbcType}
+import slick.jdbc.{JdbcProfile, JdbcType, SQLiteProfile}
 import slick.lifted.ProvenShape
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -68,21 +69,23 @@ class SlickUrlDao(val jdbcProfile: JdbcProfile, db: BasicBackend#DatabaseDef) ex
   override def fetchAll(page: Int, pageSize: Int)(implicit executionContext: ExecutionContext): Future[List[Url]] =
     db.run(urls.drop(page * pageSize).take(pageSize).sortBy(_.createdAt).result).map(_.toList)
 
-  def initialize()(implicit executionContext: ExecutionContext): Future[Either[MTable, MTable]] =
-    initialize(initial = true)
+  //
+  // db.run(MTable.getTables(SlickUrlDao.TABLE_NAME)) is NOT supported by Aurora MYSQL Serverless
+  //
+  override def initialize()(implicit executionContext: ExecutionContext): FutureOpt[InitializationResult] =
+    FutureOpt[InitializationResult, Future, Option] {
+      jdbcProfile match {
+        case SQLiteProfile => Future.successful(None)
+        case _ =>
+          db.run(sql"SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = ${SlickUrlDao.TABLE_NAME}".as[Int])
+            .flatMap {
+              case Vector(0) =>
+                db.run(urls.schema.create).map(_ => Some(SlickDaoInitializationResult(SlickUrlDao.TABLE_NAME)))
 
-  private def initialize(initial: Boolean)(implicit executionContext: ExecutionContext): Future[Either[MTable, MTable]] =
-    db.run(MTable.getTables)
-      .flatMap { tables =>
-        println(tables.map(_.name.name))
-        tables.find(_.name.name == SlickUrlDao.TABLE_NAME)
-          .fold {
-            if (initial)
-              db.run(urls.schema.create).flatMap(_ => initialize(initial = false))
-            else
-              Future.failed(DatabaseTableInitializationException(SlickUrlDao.TABLE_NAME))
-          } (table => if (initial) Future.successful(Left(table)) else Future.successful(Right(table)))
+              case _ => Future.successful(None)
+            }
       }
+    }
 }
 
 object SlickUrlDao {

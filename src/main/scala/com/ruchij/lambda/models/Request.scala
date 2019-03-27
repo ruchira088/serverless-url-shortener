@@ -1,6 +1,6 @@
 package com.ruchij.lambda.models
 
-import com.ruchij.general.Constants
+import com.ruchij.general.Messages
 
 import scala.collection.JavaConverters._
 
@@ -10,7 +10,7 @@ class Request(
   var path: String,
   var queryParameters: Map[String, Seq[String]]
 ) {
-  def this() = this(None, Map.empty, Constants.EMPTY_STRING, Map.empty[String, Seq[String]])
+  def this() = this(None, Map.empty, Messages.EMPTY_STRING, Map.empty[String, Seq[String]])
 
   def setBody(requestBody: String): Unit =
     body = Option(requestBody)
