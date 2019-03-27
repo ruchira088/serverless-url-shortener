@@ -1,8 +1,10 @@
 package com.ruchij.services.url
+import com.ruchij.FutureOpt
 import com.ruchij.config.service.ServiceConfiguration
 import com.ruchij.dao.UrlDao
+import com.ruchij.dao.models.InitializationResult
 import com.ruchij.exceptions.{ExistingUrlKeyException, MissingUrlKeyException}
-import com.ruchij.general.Constants
+import com.ruchij.general.Messages
 import com.ruchij.services.hashing.HashingService
 import com.ruchij.services.url.UrlShorteningService.mapper
 import com.ruchij.services.url.models.Url
@@ -24,7 +26,7 @@ class UrlShorteningService @Inject()(
     urlDao.fetch(key).value.flatMap(mapper(key))
 
   def insert(longUrl: String)(implicit executionContext: ExecutionContext): Future[Either[Url, Url]] =
-    insert(longUrl, Constants.EMPTY_STRING, serviceConfiguration.keyLength, serviceConfiguration.fixedKeyLengthRetries)
+    insert(longUrl, Messages.EMPTY_STRING, serviceConfiguration.keyLength, serviceConfiguration.fixedKeyLengthRetries)
 
   def insert(key: String, longUrl: String)(implicit executionContext: ExecutionContext): Future[Either[Url, Url]] =
     urlDao.fetch(key).value
@@ -38,6 +40,9 @@ class UrlShorteningService @Inject()(
 
   def fetchAll(page: Int, pageSize: Int)(implicit executionContext: ExecutionContext): Future[List[Url]] =
     urlDao.fetchAll(page, pageSize)
+
+  def initialize()(implicit executionContext: ExecutionContext): FutureOpt[InitializationResult] =
+    urlDao.initialize()
 
   private def insert(longUrl: String, suffix: String, keySize: Int, remaining: Int)(
     implicit executionContext: ExecutionContext

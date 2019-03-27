@@ -1,0 +1,10 @@
+# The following values are populated by the CI/CD pipeline for each branch. The values are generated
+# by the Terraform output
+
+mysqlUrl:
+mysqlUser:
+mysqlPassword:
+securityGroup:
+subnetOne:
+subnetTwo:
+subnetThree:

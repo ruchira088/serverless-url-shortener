@@ -1,4 +1,4 @@
-resource "aws_security_group" "serverless_security" {
+resource "aws_security_group" "lambda_security_group" {
   vpc_id = "${var.vpc_id}"
 
   ingress {
@@ -22,14 +22,18 @@ resource "aws_security_group" "serverless_security" {
     protocol = "TCP"
     to_port = 3306
 
-    cidr_blocks = ["${aws_security_group.database_security_group.id}"]
+    cidr_blocks = ["${data.aws_subnet.aws_data_subnets.*.cidr_block}"]
   }
 
   tags {
-    Name = "shortened-url-serverless-security-group"
+    Name = "${var.branch_name}-shortened-url-serverless-security-group"
   }
 }
 
 output "serverless_security_group" {
-  value = "${aws_security_group.serverless_security.id}"
+  value = "${aws_security_group.lambda_security_group.id}"
+}
+
+output "lambda_subnet_ids" {
+  value = "${data.aws_subnet_ids.aws_lambda_subnet_ids.ids}"
 }
