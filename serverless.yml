@@ -1,5 +1,5 @@
 
-service: ${opt:branchName}-serverless-url-shortener
+service: ${opt:branchName}-url-shortener
 
 custom: ${file(./config/config.yml)}
 

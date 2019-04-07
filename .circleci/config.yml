@@ -90,7 +90,7 @@ jobs:
           command: ./config/serverless-values.sh
       - run:
           name: Deploy
-          command: serverless deploy -v --branchName ${CIRCLE_BRANCH}
+          command: serverless deploy -v --branchName ${CIRCLE_BRANCH:0:20}
       - persist_to_workspace:
           root: .
           paths:
